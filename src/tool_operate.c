@@ -82,6 +82,7 @@
 #include "tool_help.h"
 #include "tool_hugehelp.h"
 #include "tool_progress.h"
+#include "dynbuf.h"
 
 #include "memdebug.h" /* keep this as LAST include */
 
@@ -1765,11 +1766,35 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         my_setopt_slist(curl, CURLOPT_POSTQUOTE, config->postquote);
         my_setopt_slist(curl, CURLOPT_PREQUOTE, config->prequote);
 
-        if(config->cookie)
-          my_setopt_str(curl, CURLOPT_COOKIE, config->cookie);
+        if(config->cookies) {
+          struct curlx_dynbuf cookies;
+          struct curl_slist *cl;
+          CURLcode ret;
 
-        if(config->cookiefile)
-          my_setopt_str(curl, CURLOPT_COOKIEFILE, config->cookiefile);
+          /* The maximum size needs to match MAX_NAME in cookie.h */
+          curlx_dyn_init(&cookies, 4096);
+          for(cl = config->cookies; cl; cl = cl->next) {
+            if(cl == config->cookies)
+              ret = curlx_dyn_addf(&cookies, "%s", cl->data);
+            else
+              ret = curlx_dyn_addf(&cookies, ";%s", cl->data);
+
+            if(ret) {
+              result = CURLE_OUT_OF_MEMORY;
+              break;
+            }
+          }
+
+          my_setopt_str(curl, CURLOPT_COOKIE, curlx_dyn_ptr(&cookies));
+          curlx_dyn_free(&cookies);
+        }
+
+        if(config->cookiefiles) {
+          struct curl_slist *cfl;
+
+          for(cfl = config->cookiefiles; cfl; cfl = cfl->next)
+            my_setopt_str(curl, CURLOPT_COOKIEFILE, cfl->data);
+        }
 
         /* new in libcurl 7.9 */
         if(config->cookiejar)
@@ -1975,6 +2000,9 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         /* curl 7.20.x */
         if(config->ftp_pret)
           my_setopt(curl, CURLOPT_FTP_USE_PRET, 1L);
+
+        if(config->create_file_mode)
+          my_setopt(curl, CURLOPT_NEW_FILE_PERMS, config->create_file_mode);
 
         if(config->proto_present)
           my_setopt_flags(curl, CURLOPT_PROTOCOLS, config->proto);
@@ -2549,7 +2577,7 @@ static CURLcode run_all_transfers(struct GlobalConfig *global,
 CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
 {
   CURLcode result = CURLE_OK;
-  char *first_arg = curlx_convert_tchar_to_UTF8(argv[1]);
+  char *first_arg = argc > 1 ? curlx_convert_tchar_to_UTF8(argv[1]) : NULL;
 
   /* Setup proper locale from environment */
 #ifdef HAVE_SETLOCALE
