@@ -143,12 +143,13 @@ AC_SUBST(PKGADD_VENDOR)
 
 dnl
 dnl initialize all the info variables
-    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl,bearssl} )"
+    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl,bearssl,rustls} )"
     curl_ssh_msg="no      (--with-{libssh,libssh2})"
    curl_zlib_msg="no      (--with-zlib)"
  curl_brotli_msg="no      (--with-brotli)"
    curl_zstd_msg="no      (--with-zstd)"
     curl_gss_msg="no      (--with-gssapi)"
+  curl_gsasl_msg="no      (--with-gsasl)"
 curl_tls_srp_msg="no      (--enable-tls-srp)"
     curl_res_msg="default (--enable-ares / --enable-threaded-resolver)"
    curl_ipv6_msg="no      (--enable-ipv6)"
@@ -166,8 +167,8 @@ curl_verbose_msg="enabled (--disable-verbose)"
     curl_psl_msg="no      (--with-libpsl)"
  curl_altsvc_msg="enabled";
     ssl_backends=
-     curl_h1_msg="enabled (--with-hyper)"
-     curl_h2_msg="no      (--with-nghttp2)"
+     curl_h1_msg="enabled (internal)"
+     curl_h2_msg="no      (--with-nghttp2, --with-hyper)"
      curl_h3_msg="no      (--with-ngtcp2, --with-quiche)"
 
 enable_altsvc="yes"
@@ -2227,26 +2228,15 @@ if test "$GNUTLS_ENABLED" = "1"; then
   USE_GNUTLS_NETTLE=
   # First check if we can detect either crypto library via transitive linking
   AC_CHECK_LIB(gnutls, nettle_MD5Init, [ USE_GNUTLS_NETTLE=1 ])
-  if test "$USE_GNUTLS_NETTLE" = ""; then
-    AC_CHECK_LIB(gnutls, gcry_control, [ USE_GNUTLS_NETTLE=0 ])
-  fi
+
   # If not, try linking directly to both of them to see if they are available
   if test "$USE_GNUTLS_NETTLE" = ""; then
     AC_CHECK_LIB(nettle, nettle_MD5Init, [ USE_GNUTLS_NETTLE=1 ])
   fi
   if test "$USE_GNUTLS_NETTLE" = ""; then
-    AC_CHECK_LIB(gcrypt, gcry_control, [ USE_GNUTLS_NETTLE=0 ])
+    AC_MSG_ERROR([GnuTLS found, but nettle was not found])
   fi
-  if test "$USE_GNUTLS_NETTLE" = ""; then
-    AC_MSG_ERROR([GnuTLS found, but neither gcrypt nor nettle found])
-  fi
-  if test "$USE_GNUTLS_NETTLE" = "1"; then
-    AC_DEFINE(USE_GNUTLS_NETTLE, 1, [if GnuTLS uses nettle as crypto backend])
-    AC_SUBST(USE_GNUTLS_NETTLE, [1])
-    LIBS="-lnettle $LIBS"
-  else
-    LIBS="-lgcrypt $LIBS"
-  fi
+  LIBS="-lnettle $LIBS"
 fi
 
 dnl ---
@@ -2698,6 +2688,96 @@ if test -z "$ssl_backends" -o "x$OPT_BEARSSL" != xno; then
 fi
 
 dnl ----------------------------------------------------
+dnl check for rustls
+dnl ----------------------------------------------------
+
+OPT_RUSTLS=no
+
+_cppflags=$CPPFLAGS
+_ldflags=$LDFLAGS
+AC_ARG_WITH(rustls,dnl
+AC_HELP_STRING([--with-rustls=PATH],[where to look for rustls, PATH points to the installation root])
+AC_HELP_STRING([--without-rustls], [disable rustls detection]),
+  OPT_RUSTLS=$withval)
+
+if test -z "$ssl_backends" -o "x$OPT_RUSTLS" != xno; then
+  ssl_msg=
+
+  if test X"$OPT_RUSTLS" != Xno; then
+
+    if test "$OPT_RUSTLS" = "yes"; then
+      OPT_RUSTLS=""
+    fi
+
+    if test -z "$OPT_RUSTLS" ; then
+      dnl check for lib first without setting any new path
+
+      AC_CHECK_LIB(crustls, rustls_client_session_read,
+      dnl libcrustls found, set the variable
+       [
+         AC_DEFINE(USE_RUSTLS, 1, [if rustls is enabled])
+         AC_SUBST(USE_RUSTLS, [1])
+         RUSTLS_ENABLED=1
+         USE_RUSTLS="yes"
+         ssl_msg="rustls"
+	 test rustls != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+        ], [], -lpthread -ldl)
+    fi
+
+    addld=""
+    addlib="-lpthread"
+    addcflags=""
+    bearssllib=""
+
+    if test "x$USE_RUSTLS" != "xyes"; then
+      dnl add the path and test again
+      addld=-L$OPT_RUSTLS/lib$libsuff
+      addcflags=-I$OPT_RUSTLS/include
+      rustlslib=$OPT_RUSTLS/lib$libsuff
+
+      LDFLAGS="$LDFLAGS $addld"
+      if test "$addcflags" != "-I/usr/include"; then
+         CPPFLAGS="$CPPFLAGS $addcflags"
+      fi
+
+      AC_CHECK_LIB(crustls, rustls_client_session_read,
+       [
+       AC_DEFINE(USE_RUSTLS, 1, [if rustls is enabled])
+       AC_SUBST(USE_RUSTLS, [1])
+       RUSTLS_ENABLED=1
+       USE_RUSTLS="yes"
+       ssl_msg="rustls"
+       test rustls != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+       ],
+       AC_MSG_ERROR([--with-rustls was specified but could not find rustls.]),
+       -lpthread -ldl)
+    fi
+
+    if test "x$USE_RUSTLS" = "xyes"; then
+      AC_MSG_NOTICE([detected rustls])
+      check_for_ca_bundle=1
+
+      LIBS="-lcrustls -lpthread -ldl $LIBS"
+
+      if test -n "$rustlslib"; then
+        dnl when shared libs were found in a path that the run-time
+        dnl linker doesn't search through, we need to add it to
+        dnl CURL_LIBRARY_PATH to prevent further configure tests to fail
+        dnl due to this
+        if test "x$cross_compiling" != "xyes"; then
+          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$rustlslib"
+          export CURL_LIBRARY_PATH
+          AC_MSG_NOTICE([Added $rustlslib to CURL_LIBRARY_PATH])
+        fi
+      fi
+    fi
+
+  fi dnl rustls not disabled
+
+  test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
+fi
+
+dnl ----------------------------------------------------
 dnl NSS. Only check if GnuTLS and OpenSSL are not enabled
 dnl ----------------------------------------------------
 
@@ -2827,7 +2907,8 @@ if test -z "$ssl_backends" -o "x$OPT_NSS" != xno; then
   test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
 fi
 
-case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$SCHANNEL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$BEARSSL_ENABLED$AMISSL_ENABLED" in
+case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$SCHANNEL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$BEARSSL_ENABLED$AMISSL_ENABLED$RUSTLS_ENABLED"
+in
 x)
   AC_MSG_WARN([SSL disabled, you will not be able to use HTTPS, FTPS, NTLM and more.])
   AC_MSG_WARN([Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink, --with-amissl or --with-bearssl to address this.])
@@ -2894,6 +2975,28 @@ if test $with_libpsl != "no"; then
   )
 fi
 AM_CONDITIONAL([USE_LIBPSL], [test "$curl_psl_msg" = "enabled"])
+
+
+dnl **********************************************************************
+dnl Check for libgsasl
+dnl **********************************************************************
+
+AC_ARG_WITH(libgsasl,
+           AS_HELP_STRING([--without-libgsasl],
+           [disable libgsasl support for SCRAM]),
+           with_libgsasl=$withval,
+           with_libgsasl=yes)
+if test $with_libgsasl != "no"; then
+  AC_SEARCH_LIBS(gsasl_init, gsasl,
+    [curl_gsasl_msg="enabled";
+     AC_DEFINE([USE_GSASL], [1], [GSASL support enabled])
+     ],
+    [curl_gsasl_msg="no      (libgsasl not found)";
+     AC_MSG_WARN([libgsasl was not found])
+     ]
+  )
+fi
+AM_CONDITIONAL([USE_GSASL], [test "$curl_gsasl_msg" = "enabled"])
 
 dnl **********************************************************************
 dnl Check for libmetalink
@@ -3902,7 +4005,7 @@ dnl **********************************************************************
 dnl Check for quiche (QUIC)
 dnl **********************************************************************
 
-OPT_QUICHE="yes"
+OPT_QUICHE="no"
 
 if test "x$disable_http" = "xyes" -o "x$USE_NGTCP" = "x1"; then
   # without HTTP or with ngtcp2, quiche is no use
@@ -3974,9 +4077,7 @@ if test X"$want_quiche" != Xno; then
        )
       ],
         dnl not found, revert back to clean variables
-        LDFLAGS=$CLEANLDFLAGS
-        CPPFLAGS=$CLEANCPPFLAGS
-        LIBS=$CLEANLIBS
+        AC_MSG_ERROR([couldn't use quiche])
     )
   else
     dnl no quiche pkg-config found, deal with it
@@ -3992,12 +4093,7 @@ dnl **********************************************************************
 dnl Check for Hyper
 dnl **********************************************************************
 
-OPT_HYPER="yes"
-
-if test "x$disable_http" = "xyes"; then
-  # without HTTP, hyper is of no use
-  OPT_HYPER="no"
-fi
+OPT_HYPER="no"
 
 AC_ARG_WITH(hyper,
 AC_HELP_STRING([--with-hyper=PATH],[Enable hyper usage])
@@ -4021,6 +4117,10 @@ case "$OPT_HYPER" in
 esac
 
 if test X"$want_hyper" != Xno; then
+  if test "x$disable_http" = "xyes"; then
+    AC_MSG_ERROR([--with-hyper is not compatible with --disable-http])
+  fi
+
   dnl backup the pre-hyper variables
   CLEANLDFLAGS="$LDFLAGS"
   CLEANCPPFLAGS="$CPPFLAGS"
@@ -4037,7 +4137,7 @@ if test X"$want_hyper" != Xno; then
       $PKGCONFIG --libs-only-L hyper`
   else
     dnl no hyper pkg-config found
-    LIB_HYPER="-lhyper"
+    LIB_HYPER="-lhyper -ldl -lpthread -lm"
     if test X"$want_hyper" != Xdefault; then
       CPP_HYPER=-I"$want_hyper_path/capi/include"
       LD_HYPER="-L$want_hyper_path/target/debug"
@@ -4071,10 +4171,7 @@ if test X"$want_hyper" != Xno; then
           AC_MSG_NOTICE([Added $DIR_HYPER to CURL_LIBRARY_PATH]),
        )
       ],
-        dnl not found, revert back to clean variables
-        LDFLAGS=$CLEANLDFLAGS
-        CPPFLAGS=$CLEANCPPFLAGS
-        LIBS=$CLEANLIBS
+      AC_MSG_ERROR([--with-hyper but hyper was not found. See docs/HYPER.md.])
     )
   fi
 fi
@@ -4394,7 +4491,6 @@ CURL_CHECK_FUNC_STRCMPI
 CURL_CHECK_FUNC_STRDUP
 CURL_CHECK_FUNC_STRERROR_R
 CURL_CHECK_FUNC_STRICMP
-CURL_CHECK_FUNC_STRNCASECMP
 CURL_CHECK_FUNC_STRNCMPI
 CURL_CHECK_FUNC_STRNICMP
 CURL_CHECK_FUNC_STRSTR
@@ -5103,6 +5199,10 @@ if test "x$curl_psl_msg" = "xenabled"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES PSL"
 fi
 
+if test "x$curl_gsasl_msg" = "xenabled"; then
+  SUPPORT_FEATURES="$SUPPORT_FEATURES GSASL"
+fi
+
 if test "x$enable_altsvc" = "xyes"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES alt-svc"
 fi
@@ -5337,6 +5437,7 @@ AC_MSG_NOTICE([Configured to build curl/libcurl:
   brotli:           ${curl_brotli_msg}
   zstd:             ${curl_zstd_msg}
   GSS-API:          ${curl_gss_msg}
+  GSASL:            ${curl_gsasl_msg}
   TLS-SRP:          ${curl_tls_srp_msg}
   resolver:         ${curl_res_msg}
   IPv6:             ${curl_ipv6_msg}

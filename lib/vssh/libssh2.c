@@ -1880,7 +1880,7 @@ static CURLcode ssh_statemach_act(struct Curl_easy *data, bool *block)
         }
       }
 
-      if(data->set.ftp_append)
+      if(data->set.remote_append)
         /* Try to open for append, but create if nonexisting */
         flags = LIBSSH2_FXF_WRITE|LIBSSH2_FXF_CREAT|LIBSSH2_FXF_APPEND;
       else if(data->state.resume_from > 0)
@@ -2143,7 +2143,7 @@ static CURLcode ssh_statemach_act(struct Curl_easy *data, bool *block)
         readdir_len = (size_t) rc;
         sshp->readdir_filename[readdir_len] = '\0';
 
-        if(data->set.ftp_list_only) {
+        if(data->set.list_only) {
           result = Curl_client_write(data, CLIENTWRITE_BODY,
                                      sshp->readdir_filename,
                                      readdir_len);

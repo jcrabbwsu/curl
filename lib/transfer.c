@@ -79,6 +79,7 @@
 #include "strcase.h"
 #include "urlapi-int.h"
 #include "hsts.h"
+#include "setopt.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -286,7 +287,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
      *        <DATA> CRLF
      */
     /* On non-ASCII platforms the <DATA> may or may not be
-       translated based on set.prefer_ascii while the protocol
+       translated based on state.prefer_ascii while the protocol
        portion must always be translated to the network encoding.
        To further complicate matters, line end conversion might be
        done later on, so we need to prevent CRLFs from becoming
@@ -301,7 +302,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
 
     if(
 #ifdef CURL_DO_LINEEND_CONV
-       (data->set.prefer_ascii) ||
+       (data->state.prefer_ascii) ||
 #endif
        (data->set.crlf)) {
       /* \n will become \r\n later on */
@@ -348,7 +349,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
     {
       CURLcode result;
       size_t length;
-      if(data->set.prefer_ascii)
+      if(data->state.prefer_ascii)
         /* translate the protocol and data */
         length = nread;
       else
@@ -389,7 +390,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
       nread += strlen(endofline_network); /* for the added end of line */
   }
 #ifdef CURL_DOES_CONVERSIONS
-  else if((data->set.prefer_ascii) && (!sending_http_headers)) {
+  else if((data->state.prefer_ascii) && (!sending_http_headers)) {
     CURLcode result;
     result = Curl_convert_to_network(data, data->req.upload_fromhere, nread);
     /* Curl_convert_to_network calls failf if unsuccessful */
@@ -1028,7 +1029,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       if((!sending_http_headers) && (
 #ifdef CURL_DO_LINEEND_CONV
          /* always convert if we're FTPing in ASCII mode */
-         (data->set.prefer_ascii) ||
+         (data->state.prefer_ascii) ||
 #endif
          (data->set.crlf))) {
         /* Do we need to allocate a scratch buffer? */
@@ -1415,6 +1416,8 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
     }
   }
 
+  data->state.prefer_ascii = data->set.prefer_ascii;
+  data->state.list_only = data->set.list_only;
   data->state.httpreq = data->set.method;
   data->change.url = data->set.str[STRING_SET_URL];
 
@@ -1426,11 +1429,11 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
     return result;
 
   data->state.wildcardmatch = data->set.wildcard_enabled;
-  data->set.followlocation = 0; /* reset the location-follow counter */
+  data->state.followlocation = 0; /* reset the location-follow counter */
   data->state.this_is_a_follow = FALSE; /* reset this */
   data->state.errorbuf = FALSE; /* no error has occurred */
-  data->state.httpversion = 0; /* don't assume any particular server version */
-
+  data->state.httpwant = data->set.httpwant;
+  data->state.httpversion = 0;
   data->state.authproblem = FALSE;
   data->state.authhost.want = data->set.httpauth;
   data->state.authproxy.want = data->set.proxyauth;
@@ -1506,6 +1509,19 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
       return CURLE_OUT_OF_MEMORY;
   }
 
+  if(!result)
+    result = Curl_setstropt(&data->state.aptr.user,
+                            data->set.str[STRING_USERNAME]);
+  if(!result)
+    result = Curl_setstropt(&data->state.aptr.passwd,
+                            data->set.str[STRING_PASSWORD]);
+  if(!result)
+    result = Curl_setstropt(&data->state.aptr.proxyuser,
+                            data->set.str[STRING_PROXYUSERNAME]);
+  if(!result)
+    result = Curl_setstropt(&data->state.aptr.proxypasswd,
+                            data->set.str[STRING_PROXYPASSWORD]);
+
   data->req.headerbytecount = 0;
   return result;
 }
@@ -1553,7 +1569,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
 
   if(type == FOLLOW_REDIR) {
     if((data->set.maxredirs != -1) &&
-       (data->set.followlocation >= data->set.maxredirs)) {
+       (data->state.followlocation >= data->set.maxredirs)) {
       reachedmax = TRUE;
       type = FOLLOW_FAKE; /* switch to fake to store the would-be-redirected
                              to URL */
@@ -1562,7 +1578,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
       /* mark the next request as a followed location: */
       data->state.this_is_a_follow = TRUE;
 
-      data->set.followlocation++; /* count location-followers */
+      data->state.followlocation++; /* count location-followers */
 
       if(data->set.http_auto_referer) {
         /* We are asked to automatically set the previous URL as the referer

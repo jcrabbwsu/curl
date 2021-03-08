@@ -390,7 +390,7 @@ static CURLcode bearssl_connect_step1(struct Curl_easy *data,
      */
 
 #ifdef USE_NGHTTP2
-    if(data->set.httpversion >= CURL_HTTP_VERSION_2
+    if(data->state.httpversion >= CURL_HTTP_VERSION_2
 #ifndef CURL_DISABLE_PROXY
       && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
 #endif
@@ -855,6 +855,7 @@ const struct Curl_ssl Curl_ssl_bearssl = {
   Curl_none_cert_status_request,
   bearssl_connect,
   bearssl_connect_nonblocking,
+  Curl_ssl_getsock,
   bearssl_get_internals,
   bearssl_close,
   Curl_none_close_all,

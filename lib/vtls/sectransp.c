@@ -1611,7 +1611,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
                                                        &kCFTypeArrayCallBacks);
 
 #ifdef USE_NGHTTP2
-      if(data->set.httpversion >= CURL_HTTP_VERSION_2
+      if(data->state.httpversion >= CURL_HTTP_VERSION_2
 #ifndef CURL_DISABLE_PROXY
          && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
 #endif
@@ -1941,7 +1941,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
      specifically doesn't want us doing that: */
   if(SSLSetSessionOption != NULL) {
     SSLSetSessionOption(backend->ssl_ctx, kSSLSessionOptionSendOneByteRecord,
-                      !data->set.ssl.enable_beast);
+                        !SSL_SET_OPTION(enable_beast));
     SSLSetSessionOption(backend->ssl_ctx, kSSLSessionOptionFalseStart,
                       data->set.ssl.falsestart); /* false start support */
   }
@@ -2621,9 +2621,10 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
     connssl->connecting_state = ssl_connect_3;
 
 #ifdef SECTRANSP_PINNEDPUBKEY
-    if(data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG]) {
-      CURLcode result = pkp_pin_peer_pubkey(data, backend->ssl_ctx,
-                            data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG]);
+    if(data->set.str[STRING_SSL_PINNEDPUBLICKEY]) {
+      CURLcode result =
+        pkp_pin_peer_pubkey(data, backend->ssl_ctx,
+                            data->set.str[STRING_SSL_PINNEDPUBLICKEY]);
       if(result) {
         failf(data, "SSL: public key does not match pinned public key!");
         return result;
@@ -3301,6 +3302,7 @@ const struct Curl_ssl Curl_ssl_sectransp = {
   Curl_none_cert_status_request,      /* cert_status_request */
   sectransp_connect,                  /* connect */
   sectransp_connect_nonblocking,      /* connect_nonblocking */
+  Curl_ssl_getsock,                   /* getsock */
   sectransp_get_internals,            /* get_internals */
   sectransp_close,                    /* close_one */
   Curl_none_close_all,                /* close_all */

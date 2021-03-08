@@ -183,7 +183,7 @@ static CURLcode http_setup_conn(struct Curl_easy *data,
   Curl_mime_initpart(&http->form, data);
   data->req.p.http = http;
 
-  if(data->set.httpversion == CURL_HTTP_VERSION_3) {
+  if(data->state.httpwant == CURL_HTTP_VERSION_3) {
     if(conn->handler->flags & PROTOPT_SSL)
       /* Only go HTTP/3 directly on HTTPS URLs. It needs a UDP socket and does
          the QUIC dance. */
@@ -298,26 +298,27 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
 {
   size_t size = 0;
   char *authorization = NULL;
-  struct connectdata *conn = data->conn;
   char **userp;
   const char *user;
   const char *pwd;
   CURLcode result;
   char *out;
 
+  /* credentials are unique per transfer for HTTP, do not use the ones for the
+     connection */
   if(proxy) {
 #ifndef CURL_DISABLE_PROXY
     userp = &data->state.aptr.proxyuserpwd;
-    user = conn->http_proxy.user;
-    pwd = conn->http_proxy.passwd;
+    user = data->state.aptr.proxyuser;
+    pwd = data->state.aptr.proxypasswd;
 #else
     return CURLE_NOT_BUILT_IN;
 #endif
   }
   else {
     userp = &data->state.aptr.userpwd;
-    user = conn->user;
-    pwd = conn->passwd;
+    user = data->state.aptr.user;
+    pwd = data->state.aptr.passwd;
   }
 
   out = aprintf("%s:%s", user, pwd ? pwd : "");
@@ -595,7 +596,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data)
        conn->httpversion > 11) {
       infof(data, "Forcing HTTP/1.1 for NTLM");
       connclose(conn, "Force HTTP/1.1 connection");
-      data->set.httpversion = CURL_HTTP_VERSION_1_1;
+      data->state.httpwant = CURL_HTTP_VERSION_1_1;
     }
   }
 #ifndef CURL_DISABLE_PROXY
@@ -709,7 +710,6 @@ output_auth_headers(struct Curl_easy *data,
   if(authstatus->picked == CURLAUTH_DIGEST) {
     auth = "Digest";
     result = Curl_output_digest(data,
-                                conn,
                                 proxy,
                                 (const unsigned char *)request,
                                 (const unsigned char *)path);
@@ -756,11 +756,14 @@ output_auth_headers(struct Curl_easy *data,
 #ifndef CURL_DISABLE_PROXY
     infof(data, "%s auth using %s with user '%s'\n",
           proxy ? "Proxy" : "Server", auth,
-          proxy ? (conn->http_proxy.user ? conn->http_proxy.user : "") :
-          (conn->user ? conn->user : ""));
+          proxy ? (data->state.aptr.proxyuser ?
+                   data->state.aptr.proxyuser : "") :
+          (data->state.aptr.user ?
+           data->state.aptr.user : ""));
 #else
     infof(data, "Server auth using %s with user '%s'\n",
-          auth, conn->user ? conn->user : "");
+          auth, data->state.aptr.user ?
+          data->state.aptr.user : "");
 #endif
     authstatus->multipass = (!authstatus->done) ? TRUE : FALSE;
   }
@@ -1504,7 +1507,7 @@ static CURLcode add_haproxy_protocol_header(struct Curl_easy *data)
 
   msnprintf(proxy_header,
             sizeof(proxy_header),
-            "PROXY %s %s %s %li %li\r\n",
+            "PROXY %s %s %s %i %i\r\n",
             tcp_version,
             data->info.conn_local_ip,
             data->info.conn_primary_ip,
@@ -1552,7 +1555,7 @@ static int https_getsock(struct Curl_easy *data,
 {
   (void)data;
   if(conn->handler->flags & PROTOPT_SSL)
-    return Curl_ssl_getsock(conn, socks);
+    return Curl_ssl->getsock(conn, socks);
   return GETSOCK_BLANK;
 }
 #endif /* USE_SSL */
@@ -1625,11 +1628,11 @@ static bool use_http_1_1plus(const struct Curl_easy *data,
 {
   if((data->state.httpversion == 10) || (conn->httpversion == 10))
     return FALSE;
-  if((data->set.httpversion == CURL_HTTP_VERSION_1_0) &&
+  if((data->state.httpwant == CURL_HTTP_VERSION_1_0) &&
      (conn->httpversion <= 10))
     return FALSE;
-  return ((data->set.httpversion == CURL_HTTP_VERSION_NONE) ||
-          (data->set.httpversion >= CURL_HTTP_VERSION_1_1));
+  return ((data->state.httpwant == CURL_HTTP_VERSION_NONE) ||
+          (data->state.httpwant >= CURL_HTTP_VERSION_1_1));
 }
 
 #ifndef USE_HYPER
@@ -1637,7 +1640,7 @@ static const char *get_http_string(const struct Curl_easy *data,
                                    const struct connectdata *conn)
 {
 #ifdef ENABLE_QUIC
-  if((data->set.httpversion == CURL_HTTP_VERSION_3) ||
+  if((data->state.httpwant == CURL_HTTP_VERSION_3) ||
      (conn->httpversion == 30))
     return "3";
 #endif
@@ -1702,7 +1705,7 @@ CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
 
   if(
 #ifdef CURL_DO_LINEEND_CONV
-     (handle->set.prefer_ascii) ||
+     (handle->state.prefer_ascii) ||
 #endif
      (handle->set.crlf)) {
     /* \n will become \r\n later on */
@@ -2209,7 +2212,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
         }
         if(!type) {
           result = Curl_dyn_addf(r, ";type=%c",
-                                 data->set.prefer_ascii ? 'a' : 'i');
+                                 data->state.prefer_ascii ? 'a' : 'i');
           if(result)
             return result;
         }
@@ -2950,7 +2953,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
       default:
         /* Check if user wants to use HTTP/2 with clear TCP*/
 #ifdef USE_NGHTTP2
-        if(data->set.httpversion == CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE) {
+        if(data->state.httpwant == CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE) {
 #ifndef CURL_DISABLE_PROXY
           if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
             /* We don't support HTTP/2 proxies yet. Also it's debatable
@@ -3156,10 +3159,10 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 
   if(!(conn->handler->flags&PROTOPT_SSL) &&
      conn->httpversion != 20 &&
-     (data->set.httpversion == CURL_HTTP_VERSION_2)) {
+     (data->state.httpwant == CURL_HTTP_VERSION_2)) {
     /* append HTTP2 upgrade magic stuff to the HTTP request if it isn't done
        over SSL */
-    result = Curl_http2_request_upgrade(&req, conn);
+    result = Curl_http2_request_upgrade(&req, data);
     if(result) {
       Curl_dyn_free(&req);
       return result;
@@ -4148,10 +4151,11 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
          */
         char separator;
         char twoorthree[2];
+        int httpversion = 0;
         nc = sscanf(HEADER1,
                     " HTTP/%1d.%1d%c%3d",
                     &httpversion_major,
-                    &conn->httpversion,
+                    &httpversion,
                     &separator,
                     &k->httpcode);
 
@@ -4163,7 +4167,23 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
         }
 
         if((nc == 4) && (' ' == separator)) {
-          conn->httpversion += 10 * httpversion_major;
+          httpversion += 10 * httpversion_major;
+          switch(httpversion) {
+          case 10:
+          case 11:
+#if defined(USE_NGHTTP2) || defined(USE_HYPER)
+          case 20:
+#endif
+#if defined(ENABLE_QUIC)
+          case 30:
+#endif
+            conn->httpversion = (unsigned char)httpversion;
+            break;
+          default:
+            failf(data, "Unsupported HTTP version (%u.%d) in response",
+                  httpversion/10, httpversion%10);
+            return CURLE_UNSUPPORTED_PROTOCOL;
+          }
 
           if(k->upgr101 == UPGR101_RECEIVED) {
             /* supposedly upgraded to http2 now */
@@ -4204,14 +4224,14 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       }
       else if(conn->handler->protocol & CURLPROTO_RTSP) {
         char separator;
+        int rtspversion;
         nc = sscanf(HEADER1,
                     " RTSP/%1d.%1d%c%3d",
                     &rtspversion_major,
-                    &conn->rtspversion,
+                    &rtspversion,
                     &separator,
                     &k->httpcode);
         if((nc == 4) && (' ' == separator)) {
-          conn->rtspversion += 10 * rtspversion_major;
           conn->httpversion = 11; /* For us, RTSP acts like HTTP 1.1 */
         }
         else {

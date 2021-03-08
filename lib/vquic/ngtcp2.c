@@ -580,7 +580,7 @@ static int cb_recv_stream_data(ngtcp2_conn *tconn, uint32_t flags,
 {
   struct quicsocket *qs = (struct quicsocket *)user_data;
   ssize_t nconsumed;
-  int fin = flags & NGTCP2_STREAM_DATA_FLAG_FIN ? 1 : 0;
+  int fin = (flags & NGTCP2_STREAM_DATA_FLAG_FIN) ? 1 : 0;
   (void)offset;
   (void)stream_user_data;
 
@@ -739,7 +739,8 @@ static ngtcp2_callbacks ng_callbacks = {
   NULL, /* handshake_confirmed */
   NULL, /* recv_new_token */
   ngtcp2_crypto_delete_crypto_aead_ctx_cb,
-  ngtcp2_crypto_delete_crypto_cipher_ctx_cb
+  ngtcp2_crypto_delete_crypto_cipher_ctx_cb,
+  NULL /* recv_datagram */
 };
 
 /*
@@ -758,7 +759,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   ngtcp2_path path; /* TODO: this must be initialized properly */
   struct quicsocket *qs = &conn->hequic[sockindex];
   char ipbuf[40];
-  long port;
+  int port;
   int qfd;
 
   if(qs->conn)
@@ -773,7 +774,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     return CURLE_BAD_FUNCTION_ARGUMENT;
   }
 
-  infof(data, "Connect socket %d over QUIC to %s:%ld\n",
+  infof(data, "Connect socket %d over QUIC to %s:%d\n",
         sockfd, ipbuf, port);
 
   qs->version = NGTCP2_PROTO_VER_MAX;
@@ -1291,7 +1292,6 @@ static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
 {
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.p.http;
-  int rv;
   (void)user_data;
 
   if(!data->set.postfields) {
@@ -1302,7 +1302,7 @@ static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
     DEBUGASSERT(stream->h3out->used < H3_SEND_SIZE);
 
     if(stream->h3out->used == 0) {
-      rv = nghttp3_conn_resume_stream(conn, stream_id);
+      int rv = nghttp3_conn_resume_stream(conn, stream_id);
       if(rv != 0) {
         return NGTCP2_ERR_CALLBACK_FAILURE;
       }
@@ -1788,7 +1788,6 @@ static CURLcode ng_flush_egress(struct Curl_easy *data,
   ngtcp2_path_storage_zero(&ps);
 
   for(;;) {
-    outlen = -1;
     veccnt = 0;
     stream_id = -1;
     fin = 0;
