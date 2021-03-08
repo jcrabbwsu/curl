@@ -1,0 +1,11 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /mnt/e/Classes/423/zerocopy_fork/curl
+/usr/bin/cmake: /usr/local/lib/libcurl.so.4: no version information available (required by /usr/bin/cmake)
+-- curl version=[7.76.0-DEV]
+-- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+-- Could NOT find LibSSH2 (missing: LIBSSH2_LIBRARY LIBSSH2_INCLUDE_DIR) 
+-- Enabled features: SSL IPv6 unixsockets AsynchDNS alt-svc NTLM HTTPS-proxy
+-- Enabled protocols: DICT FILE FTP FTPS GOPHER GOPHERS HTTP HTTPS IMAP IMAPS MQTT POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
+-- Enabled SSL backends: OpenSSL
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug
