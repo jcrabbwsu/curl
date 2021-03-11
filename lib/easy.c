@@ -593,38 +593,74 @@ static CURLcode easy_events(struct Curl_multi *multi)
 
 static CURLcode easy_transfer(struct Curl_multi *multi)
 {
-  bool done = FALSE;
-  CURLMcode mcode = CURLM_OK;
-  CURLcode result = CURLE_OK;
+    bool done = FALSE;
+    CURLMcode mcode = CURLM_OK;
+    CURLcode result = CURLE_OK;
 
-  while(!done && !mcode) {
-    int still_running = 0;
+    while(!done && !mcode) {
+        int still_running = 0;
 
-    mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
+        mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
 
-    if(!mcode)
-      mcode = curl_multi_perform(multi, &still_running);
+        if(!mcode)
+            mcode = curl_multi_perform(multi, &still_running);
 
-    /* only read 'still_running' if curl_multi_perform() return OK */
-    if(!mcode && !still_running) {
-      int rc;
-      CURLMsg *msg = curl_multi_info_read(multi, &rc);
-      if(msg) {
-        result = msg->data.result;
-        done = TRUE;
-      }
+        /* only read 'still_running' if curl_multi_perform() return OK */
+        if(!mcode && !still_running) {
+            int rc;
+            CURLMsg *msg = curl_multi_info_read(multi, &rc);
+            if(msg) {
+                result = msg->data.result;
+                done = TRUE;
+            }
+        }
     }
-  }
 
-  /* Make sure to return some kind of error if there was a multi problem */
-  if(mcode) {
-    result = (mcode == CURLM_OUT_OF_MEMORY) ? CURLE_OUT_OF_MEMORY :
-              /* The other multi errors should never happen, so return
-                 something suitably generic */
-              CURLE_BAD_FUNCTION_ARGUMENT;
-  }
+    /* Make sure to return some kind of error if there was a multi problem */
+    if(mcode) {
+        result = (mcode == CURLM_OUT_OF_MEMORY) ? CURLE_OUT_OF_MEMORY :
+                 /* The other multi errors should never happen, so return
+                    something suitably generic */
+                 CURLE_BAD_FUNCTION_ARGUMENT;
+    }
 
-  return result;
+    return result;
+}
+
+static CURLcode easy_transfer_zc(struct Curl_multi *multi)
+{
+    bool done = FALSE;
+    CURLMcode mcode = CURLM_OK;
+    CURLcode result = CURLE_OK;
+
+    while(!done && !mcode) {
+        int still_running = 0;
+
+        mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
+
+        if(!mcode)
+            mcode = curl_multi_perform_zc(multi, &still_running);
+
+        /* only read 'still_running' if curl_multi_perform() return OK */
+        if(!mcode && !still_running) {
+            int rc;
+            CURLMsg *msg = curl_multi_info_read(multi, &rc);
+            if(msg) {
+                result = msg->data.result;
+                done = TRUE;
+            }
+        }
+    }
+
+    /* Make sure to return some kind of error if there was a multi problem */
+    if(mcode) {
+        result = (mcode == CURLM_OUT_OF_MEMORY) ? CURLE_OUT_OF_MEMORY :
+                 /* The other multi errors should never happen, so return
+                    something suitably generic */
+                 CURLE_BAD_FUNCTION_ARGUMENT;
+    }
+
+    return result;
 }
 
 
@@ -647,64 +683,123 @@ static CURLcode easy_transfer(struct Curl_multi *multi)
  */
 static CURLcode easy_perform(struct Curl_easy *data, bool events)
 {
-  struct Curl_multi *multi;
-  CURLMcode mcode;
-  CURLcode result = CURLE_OK;
-  SIGPIPE_VARIABLE(pipe_st);
+    struct Curl_multi *multi;
+    CURLMcode mcode;
+    CURLcode result = CURLE_OK;
+    SIGPIPE_VARIABLE(pipe_st);
 
-  if(!data)
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+    if(!data)
+        return CURLE_BAD_FUNCTION_ARGUMENT;
 
-  if(data->set.errorbuffer)
-    /* clear this as early as possible */
-    data->set.errorbuffer[0] = 0;
+    if(data->set.errorbuffer)
+        /* clear this as early as possible */
+        data->set.errorbuffer[0] = 0;
 
-  if(data->multi) {
-    failf(data, "easy handle already used in multi handle");
-    return CURLE_FAILED_INIT;
-  }
+    if(data->multi) {
+        failf(data, "easy handle already used in multi handle");
+        return CURLE_FAILED_INIT;
+    }
 
-  if(data->multi_easy)
-    multi = data->multi_easy;
-  else {
-    /* this multi handle will only ever have a single easy handled attached
-       to it, so make it use minimal hashes */
-    multi = Curl_multi_handle(1, 3);
-    if(!multi)
-      return CURLE_OUT_OF_MEMORY;
-    data->multi_easy = multi;
-  }
+    if(data->multi_easy)
+        multi = data->multi_easy;
+    else {
+        /* this multi handle will only ever have a single easy handled attached
+           to it, so make it use minimal hashes */
+        multi = Curl_multi_handle(1, 3);
+        if(!multi)
+            return CURLE_OUT_OF_MEMORY;
+        data->multi_easy = multi;
+    }
 
-  if(multi->in_callback)
-    return CURLE_RECURSIVE_API_CALL;
+    if(multi->in_callback)
+        return CURLE_RECURSIVE_API_CALL;
 
-  /* Copy the MAXCONNECTS option to the multi handle */
-  curl_multi_setopt(multi, CURLMOPT_MAXCONNECTS, data->set.maxconnects);
+    /* Copy the MAXCONNECTS option to the multi handle */
+    curl_multi_setopt(multi, CURLMOPT_MAXCONNECTS, data->set.maxconnects);
 
-  mcode = curl_multi_add_handle(multi, data);
-  if(mcode) {
-    curl_multi_cleanup(multi);
-    data->multi_easy = NULL;
-    if(mcode == CURLM_OUT_OF_MEMORY)
-      return CURLE_OUT_OF_MEMORY;
-    return CURLE_FAILED_INIT;
-  }
+    mcode = curl_multi_add_handle(multi, data);
+    if(mcode) {
+        curl_multi_cleanup(multi);
+        data->multi_easy = NULL;
+        if(mcode == CURLM_OUT_OF_MEMORY)
+            return CURLE_OUT_OF_MEMORY;
+        return CURLE_FAILED_INIT;
+    }
 
-  sigpipe_ignore(data, &pipe_st);
+    sigpipe_ignore(data, &pipe_st);
 
-  /* run the transfer */
-  result = events ? easy_events(multi) : easy_transfer(multi);
+    /* run the transfer */
+    result = events ? easy_events(multi) : easy_transfer(multi);
 
-  /* ignoring the return code isn't nice, but atm we can't really handle
-     a failure here, room for future improvement! */
-  (void)curl_multi_remove_handle(multi, data);
+    /* ignoring the return code isn't nice, but atm we can't really handle
+       a failure here, room for future improvement! */
+    (void)curl_multi_remove_handle(multi, data);
 
-  sigpipe_restore(&pipe_st);
+    sigpipe_restore(&pipe_st);
 
-  /* The multi handle is kept alive, owned by the easy handle */
-  return result;
+    /* The multi handle is kept alive, owned by the easy handle */
+    return result;
 }
 
+static CURLcode easy_perform_zc(struct Curl_easy *data, bool events)
+{
+    struct Curl_multi *multi;
+    CURLMcode mcode;
+    CURLcode result = CURLE_OK;
+    SIGPIPE_VARIABLE(pipe_st);
+
+    if(!data)
+        return CURLE_BAD_FUNCTION_ARGUMENT;
+
+    if(data->set.errorbuffer)
+        /* clear this as early as possible */
+        data->set.errorbuffer[0] = 0;
+
+    if(data->multi) {
+        failf(data, "easy handle already used in multi handle");
+        return CURLE_FAILED_INIT;
+    }
+
+    if(data->multi_easy)
+        multi = data->multi_easy;
+    else {
+        /* this multi handle will only ever have a single easy handled attached
+           to it, so make it use minimal hashes */
+        multi = Curl_multi_handle(1, 3);
+        if(!multi)
+            return CURLE_OUT_OF_MEMORY;
+        data->multi_easy = multi;
+    }
+
+    if(multi->in_callback)
+        return CURLE_RECURSIVE_API_CALL;
+
+    /* Copy the MAXCONNECTS option to the multi handle */
+    curl_multi_setopt(multi, CURLMOPT_MAXCONNECTS, data->set.maxconnects);
+
+    mcode = curl_multi_add_handle(multi, data);
+    if(mcode) {
+        curl_multi_cleanup(multi);
+        data->multi_easy = NULL;
+        if(mcode == CURLM_OUT_OF_MEMORY)
+            return CURLE_OUT_OF_MEMORY;
+        return CURLE_FAILED_INIT;
+    }
+
+    sigpipe_ignore(data, &pipe_st);
+
+    /* run the transfer */
+    result = events ? easy_events(multi) : easy_transfer_zc(multi);
+
+    /* ignoring the return code isn't nice, but atm we can't really handle
+       a failure here, room for future improvement! */
+    (void)curl_multi_remove_handle(multi, data);
+
+    sigpipe_restore(&pipe_st);
+
+    /* The multi handle is kept alive, owned by the easy handle */
+    return result;
+}
 
 /*
  * curl_easy_perform() is the external interface that performs a blocking
@@ -712,7 +807,12 @@ static CURLcode easy_perform(struct Curl_easy *data, bool events)
  */
 CURLcode curl_easy_perform(struct Curl_easy *data)
 {
-  return easy_perform(data, FALSE);
+    return easy_perform(data, FALSE);
+}
+
+CURLcode curl_easy_perform_zc(struct Curl_easy *data)
+{
+    return easy_perform_zc(data, FALSE);
 }
 
 #ifdef CURLDEBUG

@@ -1656,9 +1656,22 @@ lib/CMakeFiles/libcurl.dir/vauth/digest_sspi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libcurl.dir/vauth/digest_sspi.c.s"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/digest_sspi.c -o CMakeFiles/libcurl.dir/vauth/digest_sspi.c.s
 
+lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.o: lib/CMakeFiles/libcurl.dir/flags.make
+lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.o: ../lib/vauth/gsasl.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_124) "Building C object lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.o"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/gsasl.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/gsasl.c
+
+lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/libcurl.dir/vauth/gsasl.c.i"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/gsasl.c > CMakeFiles/libcurl.dir/vauth/gsasl.c.i
+
+lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libcurl.dir/vauth/gsasl.c.s"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/gsasl.c -o CMakeFiles/libcurl.dir/vauth/gsasl.c.s
+
 lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o: ../lib/vauth/krb5_gssapi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_124) "Building C object lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_125) "Building C object lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/krb5_gssapi.c
 
 lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.i: cmake_force
@@ -1671,7 +1684,7 @@ lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o: ../lib/vauth/krb5_sspi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_125) "Building C object lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_126) "Building C object lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/krb5_sspi.c
 
 lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.i: cmake_force
@@ -1684,7 +1697,7 @@ lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.o: ../lib/vauth/ntlm.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_126) "Building C object lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_127) "Building C object lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/ntlm.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/ntlm.c
 
 lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.i: cmake_force
@@ -1697,7 +1710,7 @@ lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.o: ../lib/vauth/ntlm_sspi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_127) "Building C object lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_128) "Building C object lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/ntlm_sspi.c
 
 lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.i: cmake_force
@@ -1710,7 +1723,7 @@ lib/CMakeFiles/libcurl.dir/vauth/ntlm_sspi.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.o: ../lib/vauth/oauth2.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_128) "Building C object lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_129) "Building C object lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/oauth2.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/oauth2.c
 
 lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.i: cmake_force
@@ -1723,7 +1736,7 @@ lib/CMakeFiles/libcurl.dir/vauth/oauth2.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.o: ../lib/vauth/spnego_gssapi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_129) "Building C object lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_130) "Building C object lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/spnego_gssapi.c
 
 lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.i: cmake_force
@@ -1736,7 +1749,7 @@ lib/CMakeFiles/libcurl.dir/vauth/spnego_gssapi.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.o: ../lib/vauth/spnego_sspi.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_130) "Building C object lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_131) "Building C object lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/spnego_sspi.c
 
 lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.i: cmake_force
@@ -1749,7 +1762,7 @@ lib/CMakeFiles/libcurl.dir/vauth/spnego_sspi.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vauth/vauth.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vauth/vauth.c.o: ../lib/vauth/vauth.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_131) "Building C object lib/CMakeFiles/libcurl.dir/vauth/vauth.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_132) "Building C object lib/CMakeFiles/libcurl.dir/vauth/vauth.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vauth/vauth.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/vauth.c
 
 lib/CMakeFiles/libcurl.dir/vauth/vauth.c.i: cmake_force
@@ -1762,7 +1775,7 @@ lib/CMakeFiles/libcurl.dir/vauth/vauth.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.o: ../lib/vtls/bearssl.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_132) "Building C object lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_133) "Building C object lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/bearssl.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/bearssl.c
 
 lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.i: cmake_force
@@ -1775,7 +1788,7 @@ lib/CMakeFiles/libcurl.dir/vtls/bearssl.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/gskit.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/gskit.c.o: ../lib/vtls/gskit.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_133) "Building C object lib/CMakeFiles/libcurl.dir/vtls/gskit.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_134) "Building C object lib/CMakeFiles/libcurl.dir/vtls/gskit.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/gskit.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/gskit.c
 
 lib/CMakeFiles/libcurl.dir/vtls/gskit.c.i: cmake_force
@@ -1788,7 +1801,7 @@ lib/CMakeFiles/libcurl.dir/vtls/gskit.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/gtls.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/gtls.c.o: ../lib/vtls/gtls.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_134) "Building C object lib/CMakeFiles/libcurl.dir/vtls/gtls.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_135) "Building C object lib/CMakeFiles/libcurl.dir/vtls/gtls.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/gtls.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/gtls.c
 
 lib/CMakeFiles/libcurl.dir/vtls/gtls.c.i: cmake_force
@@ -1801,7 +1814,7 @@ lib/CMakeFiles/libcurl.dir/vtls/gtls.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/keylog.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/keylog.c.o: ../lib/vtls/keylog.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_135) "Building C object lib/CMakeFiles/libcurl.dir/vtls/keylog.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_136) "Building C object lib/CMakeFiles/libcurl.dir/vtls/keylog.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/keylog.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/keylog.c
 
 lib/CMakeFiles/libcurl.dir/vtls/keylog.c.i: cmake_force
@@ -1814,7 +1827,7 @@ lib/CMakeFiles/libcurl.dir/vtls/keylog.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.o: ../lib/vtls/mbedtls.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_136) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_137) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/mbedtls.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/mbedtls.c
 
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.i: cmake_force
@@ -1827,7 +1840,7 @@ lib/CMakeFiles/libcurl.dir/vtls/mbedtls.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o: ../lib/vtls/mbedtls_threadlock.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_137) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_138) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/mbedtls_threadlock.c
 
 lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.i: cmake_force
@@ -1840,7 +1853,7 @@ lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.o: ../lib/vtls/mesalink.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_138) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_139) "Building C object lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/mesalink.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/mesalink.c
 
 lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.i: cmake_force
@@ -1853,7 +1866,7 @@ lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/nss.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/nss.c.o: ../lib/vtls/nss.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_139) "Building C object lib/CMakeFiles/libcurl.dir/vtls/nss.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_140) "Building C object lib/CMakeFiles/libcurl.dir/vtls/nss.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/nss.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/nss.c
 
 lib/CMakeFiles/libcurl.dir/vtls/nss.c.i: cmake_force
@@ -1866,7 +1879,7 @@ lib/CMakeFiles/libcurl.dir/vtls/nss.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/openssl.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/openssl.c.o: ../lib/vtls/openssl.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_140) "Building C object lib/CMakeFiles/libcurl.dir/vtls/openssl.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_141) "Building C object lib/CMakeFiles/libcurl.dir/vtls/openssl.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/openssl.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/openssl.c
 
 lib/CMakeFiles/libcurl.dir/vtls/openssl.c.i: cmake_force
@@ -1877,9 +1890,22 @@ lib/CMakeFiles/libcurl.dir/vtls/openssl.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libcurl.dir/vtls/openssl.c.s"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/openssl.c -o CMakeFiles/libcurl.dir/vtls/openssl.c.s
 
+lib/CMakeFiles/libcurl.dir/vtls/rustls.c.o: lib/CMakeFiles/libcurl.dir/flags.make
+lib/CMakeFiles/libcurl.dir/vtls/rustls.c.o: ../lib/vtls/rustls.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_142) "Building C object lib/CMakeFiles/libcurl.dir/vtls/rustls.c.o"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/rustls.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/rustls.c
+
+lib/CMakeFiles/libcurl.dir/vtls/rustls.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/libcurl.dir/vtls/rustls.c.i"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/rustls.c > CMakeFiles/libcurl.dir/vtls/rustls.c.i
+
+lib/CMakeFiles/libcurl.dir/vtls/rustls.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/libcurl.dir/vtls/rustls.c.s"
+	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/rustls.c -o CMakeFiles/libcurl.dir/vtls/rustls.c.s
+
 lib/CMakeFiles/libcurl.dir/vtls/schannel.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/schannel.c.o: ../lib/vtls/schannel.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_141) "Building C object lib/CMakeFiles/libcurl.dir/vtls/schannel.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_143) "Building C object lib/CMakeFiles/libcurl.dir/vtls/schannel.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/schannel.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/schannel.c
 
 lib/CMakeFiles/libcurl.dir/vtls/schannel.c.i: cmake_force
@@ -1892,7 +1918,7 @@ lib/CMakeFiles/libcurl.dir/vtls/schannel.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o: ../lib/vtls/schannel_verify.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_142) "Building C object lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_144) "Building C object lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/schannel_verify.c
 
 lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.i: cmake_force
@@ -1905,7 +1931,7 @@ lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.o: ../lib/vtls/sectransp.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_143) "Building C object lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_145) "Building C object lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/sectransp.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/sectransp.c
 
 lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.i: cmake_force
@@ -1918,7 +1944,7 @@ lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/vtls.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/vtls.c.o: ../lib/vtls/vtls.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_144) "Building C object lib/CMakeFiles/libcurl.dir/vtls/vtls.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_146) "Building C object lib/CMakeFiles/libcurl.dir/vtls/vtls.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/vtls.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/vtls.c
 
 lib/CMakeFiles/libcurl.dir/vtls/vtls.c.i: cmake_force
@@ -1931,7 +1957,7 @@ lib/CMakeFiles/libcurl.dir/vtls/vtls.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.o: ../lib/vtls/wolfssl.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_145) "Building C object lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_147) "Building C object lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vtls/wolfssl.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/wolfssl.c
 
 lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.i: cmake_force
@@ -1944,7 +1970,7 @@ lib/CMakeFiles/libcurl.dir/vtls/wolfssl.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.o: ../lib/vquic/ngtcp2.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_146) "Building C object lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_148) "Building C object lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vquic/ngtcp2.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vquic/ngtcp2.c
 
 lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.i: cmake_force
@@ -1957,7 +1983,7 @@ lib/CMakeFiles/libcurl.dir/vquic/ngtcp2.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vquic/quiche.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vquic/quiche.c.o: ../lib/vquic/quiche.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_147) "Building C object lib/CMakeFiles/libcurl.dir/vquic/quiche.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_149) "Building C object lib/CMakeFiles/libcurl.dir/vquic/quiche.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vquic/quiche.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vquic/quiche.c
 
 lib/CMakeFiles/libcurl.dir/vquic/quiche.c.i: cmake_force
@@ -1970,7 +1996,7 @@ lib/CMakeFiles/libcurl.dir/vquic/quiche.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vquic/vquic.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vquic/vquic.c.o: ../lib/vquic/vquic.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_148) "Building C object lib/CMakeFiles/libcurl.dir/vquic/vquic.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_150) "Building C object lib/CMakeFiles/libcurl.dir/vquic/vquic.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vquic/vquic.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vquic/vquic.c
 
 lib/CMakeFiles/libcurl.dir/vquic/vquic.c.i: cmake_force
@@ -1983,7 +2009,7 @@ lib/CMakeFiles/libcurl.dir/vquic/vquic.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vssh/libssh.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vssh/libssh.c.o: ../lib/vssh/libssh.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_149) "Building C object lib/CMakeFiles/libcurl.dir/vssh/libssh.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_151) "Building C object lib/CMakeFiles/libcurl.dir/vssh/libssh.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vssh/libssh.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vssh/libssh.c
 
 lib/CMakeFiles/libcurl.dir/vssh/libssh.c.i: cmake_force
@@ -1996,7 +2022,7 @@ lib/CMakeFiles/libcurl.dir/vssh/libssh.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.o: ../lib/vssh/libssh2.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_150) "Building C object lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_152) "Building C object lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vssh/libssh2.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vssh/libssh2.c
 
 lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.i: cmake_force
@@ -2009,7 +2035,7 @@ lib/CMakeFiles/libcurl.dir/vssh/libssh2.c.s: cmake_force
 
 lib/CMakeFiles/libcurl.dir/vssh/wolfssh.c.o: lib/CMakeFiles/libcurl.dir/flags.make
 lib/CMakeFiles/libcurl.dir/vssh/wolfssh.c.o: ../lib/vssh/wolfssh.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_151) "Building C object lib/CMakeFiles/libcurl.dir/vssh/wolfssh.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_153) "Building C object lib/CMakeFiles/libcurl.dir/vssh/wolfssh.c.o"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/libcurl.dir/vssh/wolfssh.c.o   -c /mnt/e/Classes/423/zerocopy_fork/curl/lib/vssh/wolfssh.c
 
 lib/CMakeFiles/libcurl.dir/vssh/wolfssh.c.i: cmake_force
@@ -2145,6 +2171,7 @@ libcurl_OBJECTS = \
 "CMakeFiles/libcurl.dir/vauth/cram.c.o" \
 "CMakeFiles/libcurl.dir/vauth/digest.c.o" \
 "CMakeFiles/libcurl.dir/vauth/digest_sspi.c.o" \
+"CMakeFiles/libcurl.dir/vauth/gsasl.c.o" \
 "CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o" \
 "CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o" \
 "CMakeFiles/libcurl.dir/vauth/ntlm.c.o" \
@@ -2162,6 +2189,7 @@ libcurl_OBJECTS = \
 "CMakeFiles/libcurl.dir/vtls/mesalink.c.o" \
 "CMakeFiles/libcurl.dir/vtls/nss.c.o" \
 "CMakeFiles/libcurl.dir/vtls/openssl.c.o" \
+"CMakeFiles/libcurl.dir/vtls/rustls.c.o" \
 "CMakeFiles/libcurl.dir/vtls/schannel.c.o" \
 "CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o" \
 "CMakeFiles/libcurl.dir/vtls/sectransp.c.o" \
@@ -2300,6 +2328,7 @@ lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/cleartext.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/cram.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/digest.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/digest_sspi.c.o
+lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/gsasl.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/krb5_gssapi.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/krb5_sspi.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vauth/ntlm.c.o
@@ -2317,6 +2346,7 @@ lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/mbedtls_threadlock.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/mesalink.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/nss.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/openssl.c.o
+lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/rustls.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/schannel.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/schannel_verify.c.o
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/vtls/sectransp.c.o
@@ -2332,7 +2362,7 @@ lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/build.make
 lib/libcurl-d.so: /usr/lib/x86_64-linux-gnu/libssl.so
 lib/libcurl-d.so: /usr/lib/x86_64-linux-gnu/libcrypto.so
 lib/libcurl-d.so: lib/CMakeFiles/libcurl.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_152) "Linking C shared library libcurl-d.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_154) "Linking C shared library libcurl-d.so"
 	cd /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/libcurl.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

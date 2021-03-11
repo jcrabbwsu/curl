@@ -217,16 +217,19 @@ CURL_EXTERN CURLMcode curl_multi_wakeup(CURLM *multi_handle);
 CURL_EXTERN CURLMcode curl_multi_perform(CURLM *multi_handle,
                                          int *running_handles);
 
- /*
-  * Name:    curl_multi_cleanup()
-  *
-  * Desc:    Cleans up and removes a whole multi stack. It does not free or
-  *          touch any individual easy handles in any way. We need to define
-  *          in what state those handles will be if this function is called
-  *          in the middle of a transfer.
-  *
-  * Returns: CURLMcode type, general multi error code.
-  */
+CURL_EXTERN CURLMcode curl_multi_perform_zc(CURLM *multi_handle,
+                                         int *running_handles);
+
+/*
+ * Name:    curl_multi_cleanup()
+ *
+ * Desc:    Cleans up and removes a whole multi stack. It does not free or
+ *          touch any individual easy handles in any way. We need to define
+ *          in what state those handles will be if this function is called
+ *          in the middle of a transfer.
+ *
+ * Returns: CURLMcode type, general multi error code.
+ */
 CURL_EXTERN CURLMcode curl_multi_cleanup(CURLM *multi_handle);
 
 /*

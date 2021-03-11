@@ -51,6 +51,8 @@ void Curl_failf(struct Curl_easy *, const char *fmt, ...);
 
 CURLcode Curl_client_write(struct Curl_easy *data, int type, char *ptr,
                            size_t len) WARN_UNUSED_RESULT;
+CURLcode Curl_client_write_zc(struct Curl_easy *data, int type, char *ptr,
+                           size_t len) WARN_UNUSED_RESULT;
 
 bool Curl_recv_has_postponed_data(struct connectdata *conn, int sockindex);
 
@@ -64,14 +66,25 @@ ssize_t Curl_recv_plain(struct Curl_easy *data, int num, char *buf,
                         size_t len, CURLcode *code);
 ssize_t Curl_send_plain(struct Curl_easy *data, int num,
                         const void *mem, size_t len, CURLcode *code);
+ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
+                        size_t len, CURLcode *code);
+ssize_t Curl_send_plain_zc(struct Curl_easy *data, int num,
+                        const void *mem, size_t len, CURLcode *code);
 
 /* internal read-function, does plain socket, SSL and krb4 */
 CURLcode Curl_read(struct Curl_easy *data, curl_socket_t sockfd,
                    char *buf, size_t buffersize,
                    ssize_t *n);
+CURLcode Curl_read_zc(struct Curl_easy *data, curl_socket_t sockfd,
+                   char *buf, size_t buffersize,
+                   ssize_t *n);
 
 /* internal write-function, does plain socket, SSL, SCP, SFTP and krb4 */
 CURLcode Curl_write(struct Curl_easy *data,
+                    curl_socket_t sockfd,
+                    const void *mem, size_t len,
+                    ssize_t *written);
+CURLcode Curl_write_zc(struct Curl_easy *data,
                     curl_socket_t sockfd,
                     const void *mem, size_t len,
                     ssize_t *written);
