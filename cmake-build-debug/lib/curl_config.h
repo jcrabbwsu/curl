@@ -25,13 +25,13 @@
 /* #undef BUILDING_LIBCURL */
 
 /* Location of default ca bundle */
-#define CURL_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
+/* #undef CURL_CA_BUNDLE */
 
 /* define "1" to use built-in ca store of TLS backend */
 /* #undef CURL_CA_FALLBACK */
 
 /* Location of default ca path */
-#define CURL_CA_PATH "/etc/ssl/certs"
+/* #undef CURL_CA_PATH */
 
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
@@ -659,9 +659,6 @@
 /* Define to 1 if you have the `strlcpy' function. */
 /* #undef HAVE_STRLCPY */
 
-/* Define to 1 if you have the strncasecmp function. */
-/* #undef HAVE_STRNCASECMP */
-
 /* Define to 1 if you have the strncmpi function. */
 /* #undef HAVE_STRNCMPI */
 
@@ -962,9 +959,6 @@
 
 /* Define if you want to enable WIN32 threaded DNS lookup */
 /* #undef USE_THREADS_WIN32 */
-
-/* Define to disable non-blocking sockets. */
-/* #undef USE_BLOCKING_SOCKETS */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */

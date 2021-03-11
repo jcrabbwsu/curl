@@ -7,5 +7,5 @@ b6dd2b8abc2a4044a301ea86a804055c tests/CMakeFiles/test-event
 1dc8d02ce0f31496eab26e5847de18c8 tests/CMakeFiles/test-nonflaky
 6a1d797b7c087de5ccb51a4570e3cbe1 tests/CMakeFiles/test-quiet
 4ca84b50744073b1270d26a1b7b431e3 tests/CMakeFiles/test-torture
-6c1772d6e2cdaefeba906208d514a385 tests/data/CMakeFiles/show
+ea70c4266386d41cffc4b67a6f2d7725 tests/data/CMakeFiles/show
 d38a98559a401b5f5471e0194e2e884a tests/libtest/lib1521.c

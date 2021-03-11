@@ -45,6 +45,9 @@ CURLcode Curl_follow(struct Curl_easy *data, char *newurl,
 CURLcode Curl_readwrite(struct connectdata *conn,
                         struct Curl_easy *data, bool *done,
                         bool *comeback);
+CURLcode Curl_readwrite_zc(struct connectdata *conn,
+                        struct Curl_easy *data, bool *done,
+                        bool *comeback);
 int Curl_single_getsock(struct Curl_easy *data,
                         struct connectdata *conn, curl_socket_t *socks);
 CURLcode Curl_readrewind(struct Curl_easy *data);

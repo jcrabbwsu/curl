@@ -57,6 +57,7 @@
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1593.dir
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1592.dir
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1591.dir
+/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1569.dir
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1567.dir
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1565.dir
 /mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/CMakeFiles/lib1560.dir

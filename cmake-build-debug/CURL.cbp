@@ -1003,6 +1003,58 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="lib1569">
+				<Option output="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/lib1569" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DLIB1569"/>
+					<Add option="-DHAVE_CONFIG_H"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/include"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/lib"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/include"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/tests/libtest"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 lib1569"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="lib1569/fast">
+				<Option output="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/lib1569" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DLIB1569"/>
+					<Add option="-DHAVE_CONFIG_H"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/include"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/lib"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/lib"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/include"/>
+					<Add directory="/mnt/e/Classes/423/zerocopy_fork/curl/tests/libtest"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 lib1569/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="lib1567">
 				<Option output="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest/lib1567" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/mnt/e/Classes/423/zerocopy_fork/curl/cmake-build-debug/tests/libtest"/>
@@ -11014,6 +11066,9 @@
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/digest_sspi.c">
 			<Option target="libcurl"/>
 		</Unit>
+		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/gsasl.c">
+			<Option target="libcurl"/>
+		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vauth/krb5_gssapi.c">
 			<Option target="libcurl"/>
 		</Unit>
@@ -11139,6 +11194,12 @@
 			<Option target="libcurl"/>
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/openssl.h">
+			<Option target="libcurl"/>
+		</Unit>
+		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/rustls.c">
+			<Option target="libcurl"/>
+		</Unit>
+		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/rustls.h">
 			<Option target="libcurl"/>
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/lib/vtls/schannel.c">
@@ -11669,6 +11730,7 @@
 			<Option target="lib1593"/>
 			<Option target="lib1592"/>
 			<Option target="lib1591"/>
+			<Option target="lib1569"/>
 			<Option target="lib1567"/>
 			<Option target="lib1565"/>
 			<Option target="lib1560"/>
@@ -11983,6 +12045,9 @@
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/tests/libtest/lib1568.c">
 			<Option target="lib1568"/>
+		</Unit>
+		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/tests/libtest/lib1569.c">
+			<Option target="lib1569"/>
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/tests/libtest/lib1591.c">
 			<Option target="lib1591"/>
@@ -12338,6 +12403,7 @@
 			<Option target="lib1593"/>
 			<Option target="lib1592"/>
 			<Option target="lib1591"/>
+			<Option target="lib1569"/>
 			<Option target="lib1567"/>
 			<Option target="lib1565"/>
 			<Option target="lib1560"/>
@@ -12810,9 +12876,6 @@
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/CurlSymbolHiding.cmake">
-			<Option virtualFolder="CMake Files\CMake\"/>
-		</Unit>
-		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/CurlTests.c">
 			<Option virtualFolder="CMake Files\CMake\"/>
 		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/FindLibSSH2.cmake">
