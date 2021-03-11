@@ -47,6 +47,18 @@
 #include "strdup.h"
 #include "http2.h"
 
+/* ZEROCOPY */
+#define _GNU_SOURCE
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <sys/sendfile.h>
+ssize_t splice(int fd_in,
+               loff_t *off_in,
+               int fd_out,
+               loff_t *off_out,
+               size_t len,
+               unsigned int flags);
+
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -587,7 +599,55 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
         return nread;
     }
 
-    nread = sread(sockfd, buf, len);
+    /* ZEROCOPY */
+    int pipe_pd[2];
+    pipe(pipe_pd);
+
+    int splice_pid = fork();
+    if(splice_pid) /* writer */
+    {
+        close(pipe_pd[0]);
+
+        while(nread < (ssize_t)len)
+        {
+            nread += splice(sockfd,
+                           NULL,
+                           pipe_pd[1],
+                           NULL,
+                           len,
+                           0);
+        }
+
+        int status;
+        wait(&status);
+    }
+    else /* reader */
+    {
+        close(pipe_pd[1]);
+
+        char *filename = (char *)data->set.out;
+        int down_fd = open(filename, O_APPEND|O_CREAT);
+        
+        if(down_fd < 0)
+        {
+            *code = CURLE_FILE_COULDNT_READ_FILE;
+            return -1;
+        }
+
+        while(nread < (ssize_t)len)
+        {
+            nread += splice(pipe_pd[0],
+                            NULL,
+                            down_fd,
+                            NULL,
+                            len,
+                            0);
+        }
+
+        close(down_fd);
+    }
+
+    /*nread = sread(sockfd, buf, len);*/
 
     *code = CURLE_OK;
     if(-1 == nread) {
