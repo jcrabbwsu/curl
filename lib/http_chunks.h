@@ -94,5 +94,8 @@ void Curl_httpchunk_init(struct Curl_easy *data);
 CHUNKcode Curl_httpchunk_read(struct Curl_easy *data, char *datap,
                               ssize_t length, ssize_t *wrote,
                               CURLcode *passthru);
+CHUNKcode Curl_httpchunk_read_zc(struct Curl_easy *data, char *datap,
+                              ssize_t length, ssize_t *wrote,
+                              CURLcode *passthru);
 
 #endif /* HEADER_CURL_HTTP_CHUNKS_H */

@@ -1378,7 +1378,7 @@ k->size != -1 && !k->header)
         {
             /* we are in parse-the-header-mode */
             bool stop_reading = FALSE;
-            result = Curl_http_readwrite_headers(data, conn, &nread, &stop_reading);
+            result = Curl_http_readwrite_headers_zc(data, conn, &nread, &stop_reading);
             if (result)
                 return result;
 
@@ -1470,7 +1470,7 @@ k->size != -1 && !k->header)
                  */
                 CURLcode extra;
                 CHUNKcode res =
-                        Curl_httpchunk_read(data, k->str, nread, &nread, &extra);
+                        Curl_httpchunk_read_zc(data, k->str, nread, &nread, &extra);
 
                 if (CHUNKE_OK < res)
                 {
@@ -1572,7 +1572,7 @@ k->size != -1 && !k->header)
                         {
 #ifndef CURL_DISABLE_POP3
                             if (conn->handler->protocol & PROTO_FAMILY_POP3)
-                                result = Curl_pop3_write(data, k->str, nread);
+                                result = Curl_pop3_write_zc(data, k->str, nread);
                             else
 #endif /* CURL_DISABLE_POP3 */
                                 result = Curl_client_write_zc(data, CLIENTWRITE_BODY, k->str,
@@ -1580,7 +1580,7 @@ k->size != -1 && !k->header)
                         }
                     }
                     else if (!k->ignorebody)
-                        result = Curl_unencode_write(data, k->writer_stack, k->str, nread);
+                        result = Curl_unencode_write_zc(data, k->writer_stack, k->str, nread);
                 }
                 k->badheader = HEADER_NORMAL; /* taken care of now */
 

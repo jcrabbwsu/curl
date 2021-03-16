@@ -995,6 +995,16 @@ CURLcode Curl_unencode_write(struct Curl_easy *data,
   return writer->handler->unencode_write(data, writer, buf, nbytes);
 }
 
+CURLcode Curl_unencode_write_zc(struct Curl_easy *data,
+                             struct contenc_writer *writer,
+                             const char *buf, size_t nbytes)
+{
+    if(!nbytes)
+        return CURLE_OK;
+    return writer->handler->unencode_write(data, writer, buf, nbytes);
+}
+
+
 /* Close and clean-up the connection's writer stack. */
 void Curl_unencode_cleanup(struct Curl_easy *data)
 {
