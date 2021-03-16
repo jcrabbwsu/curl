@@ -49,6 +49,9 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
 CURLcode Curl_unencode_write(struct Curl_easy *data,
                              struct contenc_writer *writer,
                              const char *buf, size_t nbytes);
+CURLcode Curl_unencode_write_zc(struct Curl_easy *data,
+                             struct contenc_writer *writer,
+                             const char *buf, size_t nbytes);
 void Curl_unencode_cleanup(struct Curl_easy *data);
 char *Curl_all_content_encodings(void);
 

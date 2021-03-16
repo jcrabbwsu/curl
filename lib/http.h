@@ -291,6 +291,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,
                                      ssize_t *nread,
                                      bool *stop_reading);
+CURLcode Curl_http_readwrite_headers_zc(struct Curl_easy *data,
+                                     struct connectdata *conn,
+                                     ssize_t *nread,
+                                     bool *stop_reading);
 
 /**
  * Curl_http_output_auth() setups the authentication headers for the
