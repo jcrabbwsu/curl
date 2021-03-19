@@ -19,6 +19,8 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
+/* ZEROCOPY, splice, F_GETPIPE_SZ */
+#define _GNU_SOURCE
 
 #include "curl_setup.h"
 
@@ -52,11 +54,8 @@
 #include "http2.h"
 
 /* ZEROCOPY */
-#define _GNU_SOURCE
-
 #include <fcntl.h>
-#include <sys/wait.h>
-#include <sys/sendfile.h>
+#include <unistd.h>
 
 ssize_t splice(int fd_in,
                loff_t *off_in,
@@ -622,6 +621,16 @@ ssize_t Curl_recv_plain(struct Curl_easy *data, int num, char *buf,
 ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
                            size_t len, CURLcode *code)
 {
+    /* ZEROCOPY */
+    ssize_t splice_sockout;
+    ssize_t splice_diskin;
+    ssize_t pipe_maxcap;
+    int pipe_pd[2];
+    int check_pipe;
+    char *filename;
+    int down_fd;
+    /************/
+
     struct connectdata *conn;
     curl_socket_t sockfd;
     ssize_t nread;
@@ -639,77 +648,60 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
     }
 
     /* ZEROCOPY */
-    ssize_t splice_from_sock = 0;
-    ssize_t splice_to_disk = 0;
-    int pipe_pd[2];
-    pipe(pipe_pd);
+    check_pipe = pipe(pipe_pd);
 
-    int splice_pid = fork();
-    if (splice_pid > 0) /* writer */
+    if (check_pipe < 0)
     {
-        ssize_t splice_transfer;
-        close(pipe_pd[0]);
-
-        do
-        {
-            splice_transfer = splice(sockfd,
-                                     NULL,
-                                     pipe_pd[1],
-                                     NULL,
-                                     len,
-                                     0);
-            splice_from_sock += splice_transfer;
-        } while (splice_transfer > 0);
-
-        if (splice_transfer == -1)
-        {
-            nread = splice_transfer;
-        }
-        else
-        {
-            nread = splice_from_sock;
-        }
-
-        int status;
-        wait(&status);
+        printf("pipe setup failed in Curl_recv_plain_zc\n");
+        return -1;
     }
-    else if (splice_pid == 0) /* reader */
+
+    pipe_maxcap = fcntl(pipe_pd[0], F_GETPIPE_SZ);
+    filename = (char *) data->set.out;
+    down_fd = open(filename, O_WRONLY | O_CREAT);
+    if (down_fd < 0)
     {
-        ssize_t splice_transfer;
-        close(pipe_pd[1]);
+        *code = CURLE_FILE_COULDNT_READ_FILE;
+        return -1;
+    }
 
-        char *filename = (char *) data->set.out;
-        int down_fd = open(filename, O_APPEND | O_CREAT);
+    do
+    {
+        /* sock -> pipe */
+        splice_sockout = splice(sockfd,
+                                NULL,
+                                pipe_pd[1],
+                                NULL,
+                                pipe_maxcap,
+                                0);
 
-        if (down_fd < 0)
+        if (splice_sockout == 0)
         {
-            *code = CURLE_FILE_COULDNT_READ_FILE;
-            return -1;
+            break;
         }
 
-        do
-        {
-            splice_transfer = splice(pipe_pd[0],
-                                     NULL,
-                                     down_fd,
-                                     NULL,
-                                     len,
-                                     0);
-            splice_to_disk += splice_transfer;
-        } while (splice_transfer > 0);
+        /* pipe -> disk */
+        splice_diskin = splice(pipe_pd[0],
+                               NULL,
+                               down_fd,
+                               NULL,
+                               pipe_maxcap,
+                               0);
 
-        close(down_fd);
-    }
-    else /* -1, fork failed */
-    {
-        /* piggy-backing on existing error handling
-         * indicates SOCKERRNO */
-        nread = -1;
-    }
+        if (splice_diskin != splice_sockout)
+        {
+            printf("splice failed in Curl_recv_plain_zc\n");
+            printf("errno = %d\n", errno);
+            break;
+        }
+    } while (1);
+
+    close(down_fd);
 
     /*nread = sread(sockfd, buf, len);*/
 
     *code = CURLE_OK;
+
     if (-1 == nread)
     {
         int err = SOCKERRNO;
