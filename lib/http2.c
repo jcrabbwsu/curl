@@ -1446,13 +1446,15 @@ CURLcode Curl_http2_done_sending(struct Curl_easy *data,
 
       H2BUGF(infof(data, "HTTP/2 still wants to send data (easy %p)\n", data));
 
-      /* re-set KEEP_SEND to make sure we are called again */
-      k->keepon |= KEEP_SEND;
-
       /* and attempt to send the pending frames */
       rv = h2_session_send(data, h2);
       if(rv != 0)
         result = CURLE_SEND_ERROR;
+
+      if(nghttp2_session_want_write(h2)) {
+         /* re-set KEEP_SEND to make sure we are called again */
+         k->keepon |= KEEP_SEND;
+      }
     }
   }
   return result;
@@ -1729,6 +1731,17 @@ static ssize_t http2_recv(struct Curl_easy *data, int sockindex,
       }
 
       if(nread == 0) {
+        if(!stream->closed) {
+          /* This will happen when the server or proxy server is SIGKILLed
+             during data transfer. We should emit an error since our data
+             received may be incomplete. */
+          failf(data, "HTTP/2 stream %d was not closed cleanly before"
+                " end of the underlying stream",
+                stream->stream_id);
+          *err = CURLE_HTTP2_STREAM;
+          return -1;
+        }
+
         H2BUGF(infof(data, "end of stream\n"));
         *err = CURLE_OK;
         return 0;

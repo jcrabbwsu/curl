@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -54,6 +54,16 @@
 #  ifndef NOGDI
 #    define NOGDI
 #  endif
+/* Detect Windows App environment which has a restricted access
+ * to the Win32 APIs. */
+# if (defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)) || \
+  defined(WINAPI_FAMILY)
+#  include <winapifamily.h>
+#  if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) &&  \
+     !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#    define CURL_WINDOWS_APP
+#  endif
+# endif
 #endif
 
 /*
@@ -150,8 +160,6 @@
 /* ================================================================ */
 
 #include <curl/curl.h>
-
-#define CURL_SIZEOF_CURL_OFF_T SIZEOF_CURL_OFF_T
 
 /*
  * Disable other protocols when http is the only one desired.
@@ -412,7 +420,7 @@
 #if (SIZEOF_CURL_OFF_T == 4)
 #  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFF)
 #else
-   /* assume CURL_SIZEOF_CURL_OFF_T == 8 */
+   /* assume SIZEOF_CURL_OFF_T == 8 */
 #  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
 #endif
 #define CURL_OFF_T_MIN (-CURL_OFF_T_MAX - CURL_OFF_T_C(1))
@@ -763,17 +771,6 @@ endings either CRLF or LF so 't' is appropriate.
 #    undef USE_RECV_BEFORE_SEND_WORKAROUND
 #  endif
 #endif /* DONT_USE_RECV_BEFORE_SEND_WORKAROUND */
-
-/* Detect Windows App environment which has a restricted access
- * to the Win32 APIs. */
-# if (defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)) || \
-  defined(WINAPI_FAMILY)
-#  include <winapifamily.h>
-#  if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) &&  \
-     !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#    define CURL_WINDOWS_APP
-#  endif
-# endif
 
 /* for systems that don't detect this in configure, use a sensible default */
 #ifndef CURL_SA_FAMILY_T

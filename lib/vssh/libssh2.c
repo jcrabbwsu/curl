@@ -184,7 +184,7 @@ kbd_callback(const char *name, int name_len, const char *instruction,
              LIBSSH2_USERAUTH_KBDINT_RESPONSE *responses,
              void **abstract)
 {
-  struct connectdata *conn = (struct connectdata *)*abstract;
+  struct Curl_easy *data = (struct Curl_easy *)*abstract;
 
 #ifdef CURL_LIBSSH2_DEBUG
   fprintf(stderr, "name=%s\n", name);
@@ -199,11 +199,11 @@ kbd_callback(const char *name, int name_len, const char *instruction,
   (void)instruction_len;
 #endif  /* CURL_LIBSSH2_DEBUG */
   if(num_prompts == 1) {
+    struct connectdata *conn = data->conn;
     responses[0].text = strdup(conn->passwd);
     responses[0].length = curlx_uztoui(strlen(conn->passwd));
   }
   (void)prompts;
-  (void)abstract;
 } /* kbd_callback */
 
 static CURLcode sftp_libssh2_error_to_CURLE(unsigned long err)
@@ -3159,6 +3159,7 @@ static CURLcode ssh_connect(struct Curl_easy *data, bool *done)
     sshc->kh = libssh2_knownhost_init(sshc->ssh_session);
     if(!sshc->kh) {
       libssh2_session_free(sshc->ssh_session);
+      sshc->ssh_session = NULL;
       return CURLE_FAILED_INIT;
     }
 

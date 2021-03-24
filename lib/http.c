@@ -1095,6 +1095,14 @@ static bool http_should_fail(struct Curl_easy *data)
     return FALSE;
 
   /*
+  ** A 416 response to a resume request is presumably because the file is
+  ** already completely downloaded and thus not actually a fail.
+  */
+  if(data->state.resume_from && data->state.httpreq == HTTPREQ_GET &&
+     httpcode == 416)
+    return FALSE;
+
+  /*
   ** Any code >= 400 that's not 401 or 407 is always
   ** a terminal error
   */
@@ -2181,7 +2189,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     /* Extract the URL to use in the request. Store in STRING_TEMP_URL for
        clean-up reasons if the function returns before the free() further
        down. */
-    uc = curl_url_get(h, CURLUPART_URL, &url, 0);
+    uc = curl_url_get(h, CURLUPART_URL, &url, CURLU_NO_DEFAULT_PORT);
     if(uc) {
       curl_url_cleanup(h);
       return CURLE_OUT_OF_MEMORY;
@@ -3023,10 +3031,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
     if(!data->state.aptr.accept_encoding)
       return CURLE_OUT_OF_MEMORY;
   }
-  else {
+  else
     Curl_safefree(data->state.aptr.accept_encoding);
-    data->state.aptr.accept_encoding = NULL;
-  }
 
 #ifdef HAVE_LIBZ
   /* we only consider transfer-encoding magic if libz support is built-in */
