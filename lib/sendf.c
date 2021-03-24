@@ -629,6 +629,7 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
     int check_pipe;
     char *filename;
     int down_fd;
+    int check_close;
     /************/
 
     struct connectdata *conn;
@@ -665,7 +666,7 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
         return -1;
     }
 
-    do
+    while(1)
     {
         /* sock -> pipe */
         splice_sockout = splice(sockfd,
@@ -675,8 +676,17 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
                                 pipe_maxcap,
                                 0);
 
+        /* socket is empty */
         if (splice_sockout == 0)
         {
+            break;
+        }
+        /* splice failed */
+        else if(splice_sockout == -1)
+        {
+            printf("splice failed in Curl_recv_plain_zc\n");
+            printf("errno = %d\n", errno);
+            nread = -1;
             break;
         }
 
@@ -688,15 +698,25 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
                                pipe_maxcap,
                                0);
 
+        /* splice failed */
         if (splice_diskin != splice_sockout)
         {
             printf("splice failed in Curl_recv_plain_zc\n");
             printf("errno = %d\n", errno);
+            nread = -1;
             break;
         }
-    } while (1);
 
-    close(down_fd);
+        nread += splice_sockout;
+    }
+
+    check_close = close(down_fd);
+
+    if(check_close == -1)
+    {
+        printf("failed to close target file in Curl_recv_plain_zc\n");
+        printf("errno = %d\n", errno);
+    }
 
     /*nread = sread(sockfd, buf, len);*/
 
