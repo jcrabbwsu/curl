@@ -2369,12 +2369,21 @@ Curl_connect_ongoing(data->conn)) {
             multistate(data, MSTATE_MSGSENT);
         }
     } while((rc == CURLM_CALL_MULTI_PERFORM) || multi_ischanged(multi, FALSE));
+<<<<<<< HEAD
 
     data->result = result;
     return rc;
 }
 
 
+=======
+
+    data->result = result;
+    return rc;
+}
+
+
+>>>>>>> ca99aeab8347fe453f9c2d1b6219abfd40b9fa58
 static CURLMcode multi_runsingle_zc(struct Curl_multi *multi,
                                  struct curltime *nowp,
                                  struct Curl_easy *data)
