@@ -740,7 +740,9 @@ static ngtcp2_callbacks ng_callbacks = {
   NULL, /* recv_new_token */
   ngtcp2_crypto_delete_crypto_aead_ctx_cb,
   ngtcp2_crypto_delete_crypto_cipher_ctx_cb,
-  NULL /* recv_datagram */
+  NULL, /* recv_datagram */
+  NULL, /* ack_datagram */
+  NULL  /* lost_datagram */
 };
 
 /*
@@ -808,8 +810,8 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     return CURLE_QUIC_CONNECT_ERROR;
 
   ngtcp2_addr_init(&path.local, (struct sockaddr *)&qs->local_addr,
-                   qs->local_addrlen, NULL);
-  ngtcp2_addr_init(&path.remote, addr, addrlen, NULL);
+                   qs->local_addrlen);
+  ngtcp2_addr_init(&path.remote, addr, addrlen);
 
   rc = ngtcp2_conn_client_new(&qs->qconn, &qs->dcid, &qs->scid, &path,
                               NGTCP2_PROTO_VER_MIN, &ng_callbacks,
@@ -828,7 +830,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
  */
 int Curl_quic_ver(char *p, size_t len)
 {
-  ngtcp2_info *ng2 = ngtcp2_version(0);
+  const ngtcp2_info *ng2 = ngtcp2_version(0);
   nghttp3_info *ht3 = nghttp3_version(0);
   return msnprintf(p, len, "ngtcp2/%s nghttp3/%s",
                    ng2->version_str, ht3->version_str);
@@ -1730,9 +1732,9 @@ static CURLcode ng_process_ingress(struct Curl_easy *data,
     }
 
     ngtcp2_addr_init(&path.local, (struct sockaddr *)&qs->local_addr,
-                     qs->local_addrlen, NULL);
+                     qs->local_addrlen);
     ngtcp2_addr_init(&path.remote, (struct sockaddr *)&remote_addr,
-                     remote_addrlen, NULL);
+                     remote_addrlen);
 
     rv = ngtcp2_conn_read_pkt(qs->qconn, &path, &pi, buf, recvd, ts);
     if(rv != 0) {
