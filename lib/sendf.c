@@ -711,10 +711,21 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
     }
 
     check_close = close(down_fd);
-
     if(check_close == -1)
     {
-        printf("failed to close target file in Curl_recv_plain_zc\n");
+        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
+        printf("errno = %d\n", errno);
+    }
+    check_close = close(pipe_pd[0]);
+    if(check_close == -1)
+    {
+        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
+        printf("errno = %d\n", errno);
+    }
+    check_close = close(pipe_pd[1]);
+    if(check_close == -1)
+    {
+        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
         printf("errno = %d\n", errno);
     }
 

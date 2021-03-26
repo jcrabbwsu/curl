@@ -12878,6 +12878,9 @@
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/CurlSymbolHiding.cmake">
 			<Option virtualFolder="CMake Files\CMake\"/>
 		</Unit>
+		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/CurlTests.c">
+			<Option virtualFolder="CMake Files\CMake\"/>
+		</Unit>
 		<Unit filename="/mnt/e/Classes/423/zerocopy_fork/curl/CMake/FindLibSSH2.cmake">
 			<Option virtualFolder="CMake Files\CMake\"/>
 		</Unit>
