@@ -253,23 +253,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15ab2626-d5e3-4c3a-90b9-7aa1b07da673" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeError.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeError.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeRuleHashes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeRuleHashes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CURL.cbp" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CURL.cbp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/curl-target.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/curl-target.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/lib/curl_config.h" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/lib/curl_config.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/libcurl-target.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/libcurl-target.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/data/CMakeFiles/show.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/data/CMakeFiles/show.dir/build.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/data/Makefile.inc.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/data/Makefile.inc.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/sendf.c" beforeDir="false" afterPath="$PROJECT_DIR$/lib/sendf.c" afterDir="false" />
-    </list>
+    <list default="true" id="15ab2626-d5e3-4c3a-90b9-7aa1b07da673" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -1547,7 +1531,7 @@
       <workItem from="1614980707910" duration="2999000" />
       <workItem from="1615055708010" duration="630000" />
       <workItem from="1615142430886" duration="214000" />
-      <workItem from="1616718553375" duration="575000" />
+      <workItem from="1616718553375" duration="682000" />
     </task>
     <servers />
   </component>

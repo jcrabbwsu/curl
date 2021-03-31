@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-/* ZEROCOPY, splice, F_GETPIPE_SZ */
+/* ZEROCOPY, splice, vmsplice */
 #define _GNU_SOURCE
 
 #include "curl_setup.h"
@@ -56,13 +56,9 @@
 /* ZEROCOPY */
 #include <fcntl.h>
 #include <unistd.h>
-
-ssize_t splice(int fd_in,
-               loff_t *off_in,
-               int fd_out,
-               loff_t *off_out,
-               size_t len,
-               unsigned int flags);
+/*#include <sys/uio.h>*/
+/*ssize_t splice(int fd_in, loff_t *off_in, int fd_out,
+               loff_t *off_out, size_t len, unsigned int flags);*/
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -622,13 +618,11 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
                            size_t len, CURLcode *code)
 {
     /* ZEROCOPY */
-    ssize_t splice_sockout;
-    ssize_t splice_diskin;
-    ssize_t pipe_maxcap;
+    ssize_t splice_pipein;
+    ssize_t splice_pipeout;
+    struct iovec *iovector;
     int pipe_pd[2];
     int check_pipe;
-    char *filename;
-    int down_fd;
     int check_close;
     /************/
 
@@ -650,82 +644,76 @@ ssize_t Curl_recv_plain_zc(struct Curl_easy *data, int num, char *buf,
 
     /* ZEROCOPY */
     check_pipe = pipe(pipe_pd);
-
     if (check_pipe < 0)
     {
         printf("pipe setup failed in Curl_recv_plain_zc\n");
-        return -1;
+        nread = -1;
     }
 
-    pipe_maxcap = fcntl(pipe_pd[0], F_GETPIPE_SZ);
-    filename = (char *) data->set.out;
-    down_fd = open(filename, O_WRONLY | O_CREAT);
-    if (down_fd < 0)
+    iovector = malloc(sizeof(struct iovec));
+    if(iovector == NULL)
     {
-        *code = CURLE_FILE_COULDNT_READ_FILE;
-        return -1;
+        printf("iovector setup failed in Curl_recv_plain_zc\n");
+        nread = -1;
+    }
+    else
+    {
+        iovector->iov_base = buf;
+        iovector->iov_len = len;
     }
 
-    while(1)
+    if(nread == 0)
     {
         /* sock -> pipe */
-        splice_sockout = splice(sockfd,
-                                NULL,
-                                pipe_pd[1],
-                                NULL,
-                                pipe_maxcap,
-                                0);
-
-        /* socket is empty */
-        if (splice_sockout == 0)
-        {
-            break;
-        }
-        /* splice failed */
-        else if(splice_sockout == -1)
-        {
-            printf("splice failed in Curl_recv_plain_zc\n");
-            printf("errno = %d\n", errno);
-            nread = -1;
-            break;
-        }
-
-        /* pipe -> disk */
-        splice_diskin = splice(pipe_pd[0],
+        splice_pipein = splice(sockfd,
                                NULL,
-                               down_fd,
+                               pipe_pd[1],
                                NULL,
-                               pipe_maxcap,
+                               len,
                                0);
 
-        /* splice failed */
-        if (splice_diskin != splice_sockout)
+        /* socket is empty */
+        if (splice_pipein == 0)
+        {
+            nread = 0;
+        }
+            /* splice failed */
+        else if (splice_pipein == -1)
         {
             printf("splice failed in Curl_recv_plain_zc\n");
             printf("errno = %d\n", errno);
             nread = -1;
-            break;
         }
-
-        nread += splice_sockout;
+        else
+        {
+            nread = splice_pipein;
+        }
     }
 
-    check_close = close(down_fd);
-    if(check_close == -1)
+    if(nread > 0)
     {
-        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
-        printf("errno = %d\n", errno);
+        /* pipe -> user-space buffer */
+        splice_pipeout = vmsplice(pipe_pd[0],
+                                  iovector,
+                                  1,
+                                  0);
+
+        /* vmsplice failed */
+        if (splice_pipeout != splice_pipein)
+        {
+            printf("vmsplice failed in Curl_recv_plain_zc\n");
+            printf("errno = %d\n", errno);
+            nread = -1;
+        }
     }
-    check_close = close(pipe_pd[0]);
-    if(check_close == -1)
+
+    free(iovector);
+    check_close = 0;
+    check_close += close(pipe_pd[0]);
+    check_close += close(pipe_pd[1]);
+    if (check_close != 0)
     {
-        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
-        printf("errno = %d\n", errno);
-    }
-    check_close = close(pipe_pd[1]);
-    if(check_close == -1)
-    {
-        printf("failed to close file descriptor in Curl_recv_plain_zc\n");
+        printf("failed to close file descriptor(s) in Curl_recv_plain_zc\n");
         printf("errno = %d\n", errno);
     }
 
@@ -918,6 +906,16 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
                               char *optr,
                               size_t olen)
 {
+    /* ZEROCOPY */
+    char *filename;
+    int disk_fd;
+    ssize_t splice_pipein;
+    ssize_t splice_pipeout;
+    struct iovec *iovector;
+    int pipe_pd[2];
+    int check_pipe;
+    int check_close;
+
     struct connectdata *conn = data->conn;
     curl_write_callback writeheader = NULL;
     curl_write_callback writebody = NULL;
@@ -955,7 +953,93 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
         {
             size_t wrote;
             Curl_set_in_callback(data, true);
-            wrote = writebody(ptr, 1, chunklen, data->set.out);
+
+            /* ZEROCOPY */
+            wrote = 0;
+            check_pipe = pipe(pipe_pd);
+            if (check_pipe < 0)
+            {
+                printf("pipe setup failed in chop_write_zc\n");
+                wrote = -1;
+            }
+
+            iovector = malloc(sizeof(struct iovec));
+            if(iovector == NULL)
+            {
+                printf("iovector setup failed in chop_write_zc\n");
+                wrote = -1;
+            }
+            else
+            {
+                iovector->iov_base = ptr;
+                iovector->iov_len = chunklen;
+            }
+
+            if(wrote == 0)
+            {
+                /* user-space buffer to pipe */
+                splice_pipein = vmsplice(pipe_pd[1],
+                                         iovector,
+                                         1,
+                                         0);
+
+                /* buffer is empty */
+                if (splice_pipein == 0)
+                {
+                    wrote = 0;
+                }
+                    /* vmsplice failed */
+                else if (splice_pipein == -1)
+                {
+                    printf("vmsplice failed in chop_write_zc\n");
+                    printf("errno = %d\n", errno);
+                    wrote = -1;
+                }
+                else
+                {
+                    wrote = splice_pipein;
+                }
+            }
+
+            filename = data->set.out;
+            disk_fd = open(filename, O_WRONLY | O_CREAT, 0666);
+            if(disk_fd < 0)
+            {
+                printf("failed to open output file in chop_write_zc\n");
+                wrote = -1;
+            }
+
+            if(wrote > 0)
+            {
+                /* pipe -> disk */
+                splice_pipeout = splice(pipe_pd[0],
+                                        NULL,
+                                        disk_fd,
+                                        &data->set.set_resume_from,
+                                        chunklen,
+                                        0);
+
+                /* splice failed */
+                if (splice_pipeout != splice_pipein)
+                {
+                    printf("splice failed in chop_write_zc\n");
+                    printf("errno = %d\n", errno);
+                    wrote = -1;
+                }
+            }
+
+            free(iovector);
+            check_close = 0;
+            check_close += close(disk_fd);
+            check_close += close(pipe_pd[0]);
+            check_close += close(pipe_pd[1]);
+            if (check_close != 0)
+            {
+                printf("failed to close file descriptor(s) in chop_write_zc\n");
+                printf("errno = %d\n", errno);
+            }
+
+            /*wrote = writebody(ptr, 1, chunklen, data->set.out);*/
             Curl_set_in_callback(data, false);
 
             if (CURL_WRITEFUNC_PAUSE == wrote)

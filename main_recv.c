@@ -45,10 +45,10 @@ int main()
     int globalInit;
     char *errbuf = malloc(CURL_ERROR_SIZE);
 
-    char *filename = "test_output_zc";
-    //char *url = "http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html";
+    char *filename = "test_output_zc.txt";
+    char *url = "http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html";
     //char *url = "http://www.cplusplus.com/reference/cstdio/fprintf/";
-    char *url = "localhost:5000";
+    //char *url = "localhost:5000";
 
     globalInit = curl_global_init(CURL_GLOBAL_ALL);
 
@@ -63,7 +63,7 @@ int main()
     curl_easy_setopt(easyzc, CURLOPT_ERRORBUFFER, errbuf);
     //curl_easy_setopt(easyzc, CURLOPT_VERBOSE, 1);
 
-    /*
+
     result = curl_easy_perform_zc(easyzc);
 
     if (result == CURLE_OK)
@@ -75,11 +75,14 @@ int main()
         printf("curl_easy_perform_zc returned other than CURLE_OK\n");
         printf("%s \n", errbuf);
     }
-    */
 
-    filename = "test_output_st";
+
+    filename = "test_output_st.txt";
+    curl_easy_reset(easyzc);
+    curl_easy_setopt(easyzc, CURLOPT_URL, url);
     curl_easy_setopt(easyzc, CURLOPT_WRITEDATA, (void *) filename);
     curl_easy_setopt(easyzc, CURLOPT_WRITEFUNCTION, write_to_file);
+    curl_easy_setopt(easyzc, CURLOPT_ERRORBUFFER, errbuf);
 
     result = curl_easy_perform(easyzc);
 
