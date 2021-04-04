@@ -17,7 +17,7 @@ int main()
     int globalInit;
     char *errbuf = malloc(CURL_ERROR_SIZE);
 
-    char *filename = "testfile1.txt";
+    char *filename = "test_send_zc1.txt";
     char *url = "localhost:5000";
     curl_mimepart *uploadfile = curl_mime_addpart(mime);
     curl_mime_name(uploadfile, "file");
@@ -37,11 +37,11 @@ int main()
     curl_easy_setopt(easyzc, CURLOPT_ERRORBUFFER, errbuf);
     //curl_easy_setopt(easyzc, CURLOPT_VERBOSE, 1);
 
-    result = curl_easy_perform(easyzc);
+    result = curl_easy_perform_zc(easyzc);
 
     if (result == CURLE_OK)
     {
-        printf("curl_easy_perform successful\n");
+        printf("\ncurl_easy_perform successful\n");
     }
     else
     {

@@ -456,16 +456,16 @@ CURLcode Curl_fillreadbuffer_zc(struct Curl_easy *data, size_t bytes,
 
 #ifdef CURL_DOES_CONVERSIONS
     bool sending_http_headers = FALSE;
-  struct connectdata *conn = data->conn;
+    struct connectdata *conn = data->conn;
 
-  if(conn->handler->protocol&(PROTO_FAMILY_HTTP|CURLPROTO_RTSP)) {
-    const struct HTTP *http = data->req.p.http;
+    if(conn->handler->protocol&(PROTO_FAMILY_HTTP|CURLPROTO_RTSP)) {
+      const struct HTTP *http = data->req.p.http;
 
-    if(http->sending == HTTPSEND_REQUEST)
-      /* We're sending the HTTP request headers, not the data.
-         Remember that so we don't re-translate them into garbage. */
-      sending_http_headers = TRUE;
-  }
+      if(http->sending == HTTPSEND_REQUEST)
+        /* We're sending the HTTP request headers, not the data.
+           Remember that so we don't re-translate them into garbage. */
+        sending_http_headers = TRUE;
+    }
 #endif
 
 #ifndef CURL_DISABLE_HTTP
@@ -534,7 +534,9 @@ CURLcode Curl_fillreadbuffer_zc(struct Curl_easy *data, size_t bytes,
     else
 #endif
     {
-        readfunc = data->state.fread_func;
+        /* ZEROCOPY */
+        /*readfunc = data->state.fread_func;*/
+        readfunc = (curl_read_callback) Curl_mime_read_zc;
         extra_data = data->state.in;
     }
 
@@ -654,22 +656,22 @@ CURLcode Curl_fillreadbuffer_zc(struct Curl_easy *data, size_t bytes,
 
 #ifdef CURL_DOES_CONVERSIONS
         {
-      CURLcode result;
-      size_t length;
-      if(data->state.prefer_ascii)
-        /* translate the protocol and data */
-        length = nread;
-      else
-        /* just translate the protocol portion */
-        length = hexlen;
-      if(length) {
-        result = Curl_convert_to_network(data, data->req.upload_fromhere,
-                                         length);
-        /* Curl_convert_to_network calls failf if unsuccessful */
-        if(result)
-          return result;
-      }
-    }
+          CURLcode result;
+          size_t length;
+          if(data->state.prefer_ascii)
+            /* translate the protocol and data */
+            length = nread;
+          else
+            /* just translate the protocol portion */
+            length = hexlen;
+          if(length) {
+            result = Curl_convert_to_network(data, data->req.upload_fromhere,
+                                             length);
+            /* Curl_convert_to_network calls failf if unsuccessful */
+            if(result)
+              return result;
+          }
+        }
 #endif /* CURL_DOES_CONVERSIONS */
 
 #ifndef CURL_DISABLE_HTTP
@@ -700,12 +702,12 @@ CURLcode Curl_fillreadbuffer_zc(struct Curl_easy *data, size_t bytes,
     }
 #ifdef CURL_DOES_CONVERSIONS
     else if((data->state.prefer_ascii) && (!sending_http_headers)) {
-    CURLcode result;
-    result = Curl_convert_to_network(data, data->req.upload_fromhere, nread);
-    /* Curl_convert_to_network calls failf if unsuccessful */
-    if(result)
-      return result;
-  }
+      CURLcode result;
+      result = Curl_convert_to_network(data, data->req.upload_fromhere, nread);
+      /* Curl_convert_to_network calls failf if unsuccessful */
+      if(result)
+        return result;
+    }
 #endif /* CURL_DOES_CONVERSIONS */
 
     *nreadp = nread;

@@ -20,6 +20,9 @@
  *
  ***************************************************************************/
 
+/* ZEROCOPY */
+#define _GNU_SOURCE
+
 #include "curl_setup.h"
 
 #include <curl/curl.h>
@@ -40,6 +43,11 @@
 #include "rand.h"
 #include "slist.h"
 #include "strcase.h"
+
+/* ZEROCOPY */
+#include <fcntl.h>
+#include <unistd.h>
+
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -56,6 +64,8 @@
 #define STOP_FILLING                    ((size_t) -2)
 
 static size_t mime_subparts_read(char *buffer, size_t size, size_t nitems,
+                                 void *instream, bool *hasread);
+static size_t mime_subparts_read_zc(char *buffer, size_t size, size_t nitems,
                                  void *instream, bool *hasread);
 
 /* Encoders. */
@@ -709,6 +719,119 @@ static size_t mime_file_read(char *buffer, size_t size, size_t nitems,
   return fread(buffer, size, nitems, part->fp);
 }
 
+static size_t mime_file_read_zc(char *buffer, size_t size, size_t nitems,
+                             void *instream)
+{
+    /* ZEROCOPY */
+    char *filename;
+    int disk_fd;
+    ssize_t nread;
+    ssize_t splice_pipein;
+    ssize_t splice_pipeout;
+    struct iovec *iovector;
+    int pipe_pd[2];
+    int check_pipe;
+    int check_close;
+    /***********/
+
+    curl_mimepart *part = (curl_mimepart *) instream;
+
+    if(!nitems)
+        return STOP_FILLING;
+
+    /*if(mime_open_file(part))
+        return READ_ERROR;*/
+
+    /* ZEROCOPY */
+    nread = 0;
+    check_pipe = pipe(pipe_pd);
+    if (check_pipe < 0)
+    {
+        printf("pipe setup failed in mime_file_read_zc\n");
+        nread = -1;
+    }
+
+    iovector = malloc(sizeof(struct iovec));
+    if(iovector == NULL)
+    {
+        printf("iovector setup failed in mime_file_read_zc\n");
+        nread = -1;
+    }
+    else
+    {
+        iovector->iov_base = buffer;
+        iovector->iov_len = nitems;
+    }
+
+    filename = part->filename;
+    disk_fd = open(filename, O_RDONLY);
+    if(disk_fd < 0)
+    {
+        printf("failed to open input file in mime_file_read_zc\n");
+        nread = -1;
+    }
+
+    if(nread == 0)
+    {
+        /* disk -> pipe */
+        splice_pipein = splice(disk_fd,
+                               NULL,
+                               pipe_pd[1],
+                               NULL,
+                               nitems,
+                               0);
+        if (splice_pipein == 0)
+        {
+            nread = 0;
+        }
+        else if (splice_pipein == -1)
+        {
+            printf("splice failed in mime_file_read_zc\n");
+            printf("errno = %d\n", errno);
+            nread = -1;
+        }
+        else
+        {
+            nread = splice_pipein;
+        }
+    }
+
+    if(nread > 0)
+    {
+        /* pipe -> user space buffer */
+        splice_pipeout = vmsplice(pipe_pd[0],
+                                  iovector,
+                                  1,
+                                  0);
+        if (splice_pipeout != splice_pipein)
+        {
+            printf("vmsplice failed in mime_file_read_zc\n");
+            printf("errno = %d\n", errno);
+            nread = -1;
+        }
+
+    }
+
+    free(iovector);
+    check_close = 0;
+    check_close += close(disk_fd);
+    check_close += close(pipe_pd[0]);
+    check_close += close(pipe_pd[1]);
+    if (check_close != 0)
+    {
+        printf("failed to close file descriptor(s) in mime_file_read_zc\n");
+        printf("errno = %d\n", errno);
+    }
+
+    if(nread < 0)
+    {
+        nread = 0;
+    }
+
+    return nread;
+    /*return fread(buffer, size, nitems, part->fp);*/
+}
+
 static int mime_file_seek(void *instream, curl_off_t offset, int whence)
 {
   curl_mimepart *part = (curl_mimepart *) instream;
@@ -833,6 +956,77 @@ static size_t read_part_content(curl_mimepart *part,
   }
 
   return sz;
+}
+
+static size_t read_part_content_zc(curl_mimepart *part,
+                                char *buffer, size_t bufsize, bool *hasread)
+{
+    /* ZEROCOPY */
+    curl_read_callback save_readfunc;
+
+    size_t sz = 0;
+
+    switch(part->lastreadstatus) {
+        case 0:
+        case CURL_READFUNC_ABORT:
+        case CURL_READFUNC_PAUSE:
+        case READ_ERROR:
+            return part->lastreadstatus;
+        default:
+            break;
+    }
+
+    /* If we can determine we are at end of part data, spare a read. */
+    if(part->datasize != (curl_off_t) -1 &&
+       part->state.offset >= part->datasize) {
+        /* sz is already zero. */
+    }
+    else {
+        switch(part->kind) {
+            case MIMEKIND_MULTIPART:
+                /*
+                 * Cannot be processed as other kinds since read function requires
+                 * an additional parameter and is highly recursive.
+                 */
+                sz = mime_subparts_read_zc(buffer, 1, bufsize, part->arg, hasread);
+                break;
+            case MIMEKIND_FILE:
+                if(part->fp && feof(part->fp))
+                    break;  /* At EOF. */
+                /* FALLTHROUGH */
+            default:
+                if(part->readfunc) {
+                    if(!(part->flags & MIME_FAST_READ)) {
+                        if(*hasread)
+                            return STOP_FILLING;
+                        *hasread = TRUE;
+                    }
+                    /* ZEROCOPY */
+                    save_readfunc = part->readfunc;
+                    part->readfunc = (curl_read_callback)mime_file_read_zc;
+                    sz = part->readfunc(buffer, 1, bufsize, part->arg);
+                    part->readfunc = save_readfunc;
+                }
+                break;
+        }
+    }
+
+    switch(sz) {
+        case STOP_FILLING:
+            break;
+        case 0:
+        case CURL_READFUNC_ABORT:
+        case CURL_READFUNC_PAUSE:
+        case READ_ERROR:
+            part->lastreadstatus = sz;
+            break;
+        default:
+            part->state.offset += sz;
+            part->lastreadstatus = sz;
+            break;
+    }
+
+    return sz;
 }
 
 /* Read and encode part content. */
@@ -1000,6 +1194,110 @@ static size_t readback_part(curl_mimepart *part,
   return cursize;
 }
 
+static size_t readback_part_zc(curl_mimepart *part,
+                            char *buffer, size_t bufsize, bool *hasread)
+{
+    size_t cursize = 0;
+#ifdef CURL_DOES_CONVERSIONS
+    char *convbuf = buffer;
+#endif
+
+    /* Readback from part. */
+
+    while(bufsize) {
+        size_t sz = 0;
+        struct curl_slist *hdr = (struct curl_slist *) part->state.ptr;
+        switch(part->state.state) {
+            case MIMESTATE_BEGIN:
+                mimesetstate(&part->state,
+                             (part->flags & MIME_BODY_ONLY)?
+                             MIMESTATE_BODY: MIMESTATE_CURLHEADERS,
+                             part->curlheaders);
+                break;
+            case MIMESTATE_USERHEADERS:
+                if(!hdr) {
+                    mimesetstate(&part->state, MIMESTATE_EOH, NULL);
+                    break;
+                }
+                if(match_header(hdr, "Content-Type", 12)) {
+                    mimesetstate(&part->state, MIMESTATE_USERHEADERS, hdr->next);
+                    break;
+                }
+                /* FALLTHROUGH */
+            case MIMESTATE_CURLHEADERS:
+                if(!hdr)
+                    mimesetstate(&part->state, MIMESTATE_USERHEADERS, part->userheaders);
+                else {
+                    sz = readback_bytes(&part->state, buffer, bufsize,
+                                        hdr->data, strlen(hdr->data), "\r\n");
+                    if(!sz)
+                        mimesetstate(&part->state, part->state.state, hdr->next);
+                }
+                break;
+            case MIMESTATE_EOH:
+                sz = readback_bytes(&part->state, buffer, bufsize, "\r\n", 2, "");
+                if(!sz)
+                    mimesetstate(&part->state, MIMESTATE_BODY, NULL);
+                break;
+            case MIMESTATE_BODY:
+#ifdef CURL_DOES_CONVERSIONS
+                if(part->easy && convbuf < buffer) {
+        CURLcode result = Curl_convert_to_network(part->easy, convbuf,
+                                                  buffer - convbuf);
+        if(result)
+          return READ_ERROR;
+        convbuf = buffer;
+      }
+#endif
+                cleanup_encoder_state(&part->encstate);
+                mimesetstate(&part->state, MIMESTATE_CONTENT, NULL);
+                break;
+            case MIMESTATE_CONTENT:
+                if(part->encoder)
+                    sz = read_encoded_part_content(part, buffer, bufsize, hasread);
+                else
+                    sz = read_part_content_zc(part, buffer, bufsize, hasread);
+                switch(sz) {
+                    case 0:
+                        mimesetstate(&part->state, MIMESTATE_END, NULL);
+                        /* Try sparing open file descriptors. */
+                        if(part->kind == MIMEKIND_FILE && part->fp) {
+                            fclose(part->fp);
+                            part->fp = NULL;
+                        }
+                        /* FALLTHROUGH */
+                    case CURL_READFUNC_ABORT:
+                    case CURL_READFUNC_PAUSE:
+                    case READ_ERROR:
+                    case STOP_FILLING:
+                        return cursize? cursize: sz;
+                }
+                break;
+            case MIMESTATE_END:
+                return cursize;
+            default:
+                break;    /* Other values not in part state. */
+        }
+
+        /* Bump buffer and counters according to read size. */
+        cursize += sz;
+        buffer += sz;
+        bufsize -= sz;
+    }
+
+#ifdef CURL_DOES_CONVERSIONS
+    if(part->easy && convbuf < buffer &&
+         part->state.state < MIMESTATE_BODY) {
+        CURLcode result = Curl_convert_to_network(part->easy, convbuf,
+                                                  buffer - convbuf);
+        if(result)
+          return READ_ERROR;
+      }
+#endif
+
+    return cursize;
+}
+
 /* Readback from mime. Warning: not a read callback function. */
 static size_t mime_subparts_read(char *buffer, size_t size, size_t nitems,
                                  void *instream, bool *hasread)
@@ -1091,6 +1389,98 @@ static size_t mime_subparts_read(char *buffer, size_t size, size_t nitems,
 #endif
 
   return cursize;
+}
+
+static size_t mime_subparts_read_zc(char *buffer, size_t size, size_t nitems,
+                                 void *instream, bool *hasread)
+{
+    curl_mime *mime = (curl_mime *) instream;
+    size_t cursize = 0;
+#ifdef CURL_DOES_CONVERSIONS
+    char *convbuf = buffer;
+#endif
+
+    (void) size;   /* Always 1. */
+
+    while(nitems) {
+        size_t sz = 0;
+        curl_mimepart *part = mime->state.ptr;
+        switch(mime->state.state) {
+            case MIMESTATE_BEGIN:
+            case MIMESTATE_BODY:
+#ifdef CURL_DOES_CONVERSIONS
+                convbuf = buffer;
+#endif
+                mimesetstate(&mime->state, MIMESTATE_BOUNDARY1, mime->firstpart);
+                /* The first boundary always follows the header termination empty line,
+                   so is always preceded by a CRLF. We can then spare 2 characters
+                   by skipping the leading CRLF in boundary. */
+                mime->state.offset += 2;
+                break;
+            case MIMESTATE_BOUNDARY1:
+                sz = readback_bytes(&mime->state, buffer, nitems, "\r\n--", 4, "");
+                if(!sz)
+                    mimesetstate(&mime->state, MIMESTATE_BOUNDARY2, part);
+                break;
+            case MIMESTATE_BOUNDARY2:
+                sz = readback_bytes(&mime->state, buffer, nitems, mime->boundary,
+                                    strlen(mime->boundary), part? "\r\n": "--\r\n");
+                if(!sz) {
+#ifdef CURL_DOES_CONVERSIONS
+                    if(mime->easy && convbuf < buffer) {
+          CURLcode result = Curl_convert_to_network(mime->easy, convbuf,
+                                                    buffer - convbuf);
+          if(result)
+            return READ_ERROR;
+          convbuf = buffer;
+        }
+#endif
+                    mimesetstate(&mime->state, MIMESTATE_CONTENT, part);
+                }
+                break;
+            case MIMESTATE_CONTENT:
+                if(!part) {
+                    mimesetstate(&mime->state, MIMESTATE_END, NULL);
+                    break;
+                }
+                sz = readback_part_zc(part, buffer, nitems, hasread);
+                switch(sz) {
+                    case CURL_READFUNC_ABORT:
+                    case CURL_READFUNC_PAUSE:
+                    case READ_ERROR:
+                    case STOP_FILLING:
+                        return cursize? cursize: sz;
+                    case 0:
+#ifdef CURL_DOES_CONVERSIONS
+                        convbuf = buffer;
+#endif
+                        mimesetstate(&mime->state, MIMESTATE_BOUNDARY1, part->nextpart);
+                        break;
+                }
+                break;
+            case MIMESTATE_END:
+                return cursize;
+            default:
+                break;    /* other values not used in mime state. */
+        }
+
+        /* Bump buffer and counters according to read size. */
+        cursize += sz;
+        buffer += sz;
+        nitems -= sz;
+    }
+
+#ifdef CURL_DOES_CONVERSIONS
+    if(mime->easy && convbuf < buffer &&
+         mime->state.state <= MIMESTATE_CONTENT) {
+        CURLcode result = Curl_convert_to_network(mime->easy, convbuf,
+                                                  buffer - convbuf);
+        if(result)
+          return READ_ERROR;
+      }
+#endif
+
+    return cursize;
 }
 
 static int mime_part_rewind(curl_mimepart *part)
@@ -1639,6 +2029,28 @@ size_t Curl_mime_read(char *buffer, size_t size, size_t nitems, void *instream)
   } while(ret == STOP_FILLING);
 
   return ret;
+}
+
+size_t Curl_mime_read_zc(char *buffer, size_t size, size_t nitems, void *instream)
+{
+    curl_mimepart *part = (curl_mimepart *) instream;
+    size_t ret;
+    bool hasread;
+
+    (void) size;   /* Always 1. */
+
+    do {
+        hasread = FALSE;
+        ret = readback_part_zc(part, buffer, nitems, &hasread);
+        /*
+         * If this is not possible to get some data without calling more than
+         * one read callback (probably because a content encoder is not able to
+         * deliver a new bunch for the few data accumulated so far), force another
+         * read until we get enough data or a special exit code.
+         */
+    } while(ret == STOP_FILLING);
+
+    return ret;
 }
 
 /* Rewind mime stream. */

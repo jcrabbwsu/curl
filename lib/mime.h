@@ -149,6 +149,8 @@ CURLcode Curl_mime_prepare_headers(struct curl_mimepart *part,
 curl_off_t Curl_mime_size(struct curl_mimepart *part);
 size_t Curl_mime_read(char *buffer, size_t size, size_t nitems,
                       void *instream);
+size_t Curl_mime_read_zc(char *buffer, size_t size, size_t nitems,
+                      void *instream);
 CURLcode Curl_mime_rewind(struct curl_mimepart *part);
 const char *Curl_mime_contenttype(const char *filename);
 void Curl_mime_unpause(struct curl_mimepart *part);

@@ -380,6 +380,7 @@ CURLcode Curl_write_zc(struct Curl_easy *data,
     conn = data->conn;
     num = (sockfd == conn->sock[SECONDARYSOCKET]);
 
+    /* ZEROCOPY */
     /*bytes_written = conn->send[num](data, num, mem, len, &result);*/
     bytes_written = Curl_send_plain_zc(data, num, mem, len, &result);
 
@@ -475,6 +476,15 @@ ssize_t Curl_send_plain(struct Curl_easy *data, int num,
 ssize_t Curl_send_plain_zc(struct Curl_easy *data, int num,
                            const void *mem, size_t len, CURLcode *code)
 {
+    /* ZEROCOPY */
+    ssize_t splice_pipein;
+    ssize_t splice_pipeout;
+    struct iovec *iovector;
+    int pipe_pd[2];
+    int check_pipe;
+    int check_close;
+    /************/
+
     struct connectdata *conn;
     curl_socket_t sockfd;
     ssize_t bytes_written;
@@ -502,7 +512,82 @@ ssize_t Curl_send_plain_zc(struct Curl_easy *data, int num,
   }
   else
 #endif
-    bytes_written = swrite(sockfd, mem, len);
+    /* ZEROCOPY */
+    bytes_written = 0;
+    check_pipe = pipe(pipe_pd);
+    if (check_pipe < 0)
+    {
+        printf("pipe setup failed in Curl_send_plain_zc\n");
+        bytes_written = -1;
+    }
+
+    iovector = malloc(sizeof(struct iovec));
+    if(iovector == NULL)
+    {
+        printf("iovector setup failed in Curl_send_plain_zc\n");
+        bytes_written = -1;
+    }
+    else
+    {
+        iovector->iov_base = mem;
+        iovector->iov_len = len;
+    }
+
+    if(bytes_written == 0)
+    {
+        /* user space buffer -> pipe */
+        splice_pipein = vmsplice(pipe_pd[1],
+                                 iovector,
+                                 1,
+                                 0);
+
+        /* buffer is empty */
+        if (splice_pipein == 0)
+        {
+            bytes_written = 0;
+        }
+            /* vmsplice failed */
+        else if (splice_pipein == -1)
+        {
+            printf("vmsplice failed in Curl_send_plain_zc\n");
+            printf("errno = %d\n", errno);
+            bytes_written = -1;
+        }
+        else
+        {
+            bytes_written = splice_pipein;
+        }
+    }
+
+    if(bytes_written > 0)
+    {
+        /* pipe -> socket */
+        splice_pipeout = splice(pipe_pd[0],
+                                NULL,
+                                sockfd,
+                                NULL,
+                                len,
+                                0);
+        /* splice failed */
+        if (splice_pipeout != splice_pipein)
+        {
+            printf("splice failed in Curl_send_plain_zc\n");
+            printf("errno = %d\n", errno);
+            bytes_written = -1;
+        }
+    }
+
+    free(iovector);
+    check_close = 0;
+    check_close += close(pipe_pd[0]);
+    check_close += close(pipe_pd[1]);
+    if (check_close != 0)
+    {
+        printf("failed to close file descriptor(s) in Curl_send_plain_zc\n");
+        printf("errno = %d\n", errno);
+    }
+
+    /*bytes_written = swrite(sockfd, mem, len);*/
 
     *code = CURLE_OK;
     if (-1 == bytes_written)
@@ -915,6 +1000,7 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
     int pipe_pd[2];
     int check_pipe;
     int check_close;
+    /************/
 
     struct connectdata *conn = data->conn;
     curl_write_callback writeheader = NULL;
