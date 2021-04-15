@@ -47,10 +47,10 @@
 /* ZEROCOPY */
 #include <fcntl.h>
 #include <unistd.h>
-ssize_t splice(int fd_in, loff_t *off_in, int fd_out,
+/*ssize_t splice(int fd_in, loff_t *off_in, int fd_out,
                loff_t *off_out, size_t len, unsigned int flags);
 ssize_t vmsplice(int fd, const struct iovec *iov,
-                        unsigned long nr_segs, unsigned int flags);
+                        unsigned long nr_segs, unsigned int flags);*/
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
