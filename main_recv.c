@@ -1,11 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <curl/curl.h>
+#include "curl/include/curl/curl.h"
 
 /*I/O*/
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+//CURLcode curl_easy_perform_zc(CURL *data);
 
 /* custom write callback function */
 size_t write_to_file(char *ptr, size_t size, size_t nmemb, void *filename)
@@ -13,7 +15,7 @@ size_t write_to_file(char *ptr, size_t size, size_t nmemb, void *filename)
     size_t check_size = size * nmemb;
     ssize_t write_size;
 
-    int out_fd = open((char *) filename, O_WRONLY | O_APPEND | O_CREAT);
+    int out_fd = open((char *) filename, O_WRONLY | O_APPEND | O_CREAT, 0666);
 
     if (out_fd < 0)
     {
