@@ -1,13 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <curl/curl.h>
+#include "curl/include/curl/curl.h"
 
 /*I/O*/
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-CURLcode curl_easy_perform_zc(struct Curl_easy *data);
 
 /* custom write callback function */
 size_t write_to_file(char *ptr, size_t size, size_t nmemb, void *filename)
