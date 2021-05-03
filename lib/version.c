@@ -66,6 +66,10 @@
 #include <zstd.h>
 #endif
 
+#ifdef USE_GSASL
+#include <gsasl.h>
+#endif
+
 #ifdef HAVE_BROTLI
 static size_t brotli_version(char *buf, size_t bufsz)
 {
@@ -436,7 +440,7 @@ static curl_version_info_data version_info = {
 #ifndef CURL_DISABLE_ALTSVC
   | CURL_VERSION_ALTSVC
 #endif
-#if defined(USE_HSTS)
+#ifndef CURL_DISABLE_HSTS
   | CURL_VERSION_HSTS
 #endif
 #if defined(USE_GSASL)
@@ -469,7 +473,8 @@ static curl_version_info_data version_info = {
 #endif
   0,    /* zstd_ver_num */
   NULL, /* zstd version */
-  NULL  /* Hyper version */
+  NULL, /* Hyper version */
+  NULL  /* gsasl version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
@@ -570,6 +575,12 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
     static char hyper_buffer[30];
     msnprintf(hyper_buffer, sizeof(hyper_buffer), "Hyper/%s", hyper_version());
     version_info.hyper_version = hyper_buffer;
+  }
+#endif
+
+#ifdef USE_GSASL
+  {
+    version_info.gsasl_version = gsasl_check_version(NULL);
   }
 #endif
 

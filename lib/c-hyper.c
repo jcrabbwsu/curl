@@ -175,6 +175,8 @@ static int hyper_body_chunk(void *userdata, const hyper_buf *chunk)
   }
   if(k->ignorebody)
     return HYPER_ITER_CONTINUE;
+  if(0 == len)
+    return HYPER_ITER_CONTINUE;
   Curl_debug(data, CURLINFO_DATA_IN, buf, len);
   if(!data->set.http_ce_skip && k->writer_stack)
     /* content-encoded data */
@@ -203,11 +205,8 @@ static CURLcode status_line(struct Curl_easy *data,
                             const uint8_t *reason, size_t rlen)
 {
   CURLcode result;
-  size_t wrote;
   size_t len;
   const char *vstr;
-  curl_write_callback writeheader =
-    data->set.fwrite_header? data->set.fwrite_header: data->set.fwrite_func;
   vstr = http_version == HYPER_HTTP_VERSION_1_1 ? "1.1" :
     (http_version == HYPER_HTTP_VERSION_2 ? "2" : "1.0");
   conn->httpversion =
@@ -230,12 +229,12 @@ static CURLcode status_line(struct Curl_easy *data,
   len = Curl_dyn_len(&data->state.headerb);
   Curl_debug(data, CURLINFO_HEADER_IN, Curl_dyn_ptr(&data->state.headerb),
              len);
-  Curl_set_in_callback(data, true);
-  wrote = writeheader(Curl_dyn_ptr(&data->state.headerb), 1, len,
-                      data->set.writeheader);
-  Curl_set_in_callback(data, false);
-  if(wrote != len)
-    return CURLE_WRITE_ERROR;
+  result = Curl_client_write(data, CLIENTWRITE_HEADER,
+                             Curl_dyn_ptr(&data->state.headerb), len);
+  if(result) {
+    data->state.hresult = CURLE_ABORTED_BY_CALLBACK;
+    return HYPER_ITER_BREAK;
+  }
 
   data->info.header_size += (long)len;
   data->req.headerbytecount += (long)len;
@@ -810,8 +809,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 #endif
 
   Curl_safefree(data->state.aptr.ref);
-  if(data->change.referer && !Curl_checkheaders(data, "Referer")) {
-    data->state.aptr.ref = aprintf("Referer: %s\r\n", data->change.referer);
+  if(data->state.referer && !Curl_checkheaders(data, "Referer")) {
+    data->state.aptr.ref = aprintf("Referer: %s\r\n", data->state.referer);
     if(!data->state.aptr.ref)
       return CURLE_OUT_OF_MEMORY;
     if(Curl_hyper_header(data, headers, data->state.aptr.ref))

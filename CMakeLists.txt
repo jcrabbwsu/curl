@@ -210,6 +210,8 @@ endif()
 
 option(CURL_DISABLE_ALTSVC "to disable alt-svc support" OFF)
 mark_as_advanced(CURL_DISABLE_ALTSVC)
+option(CURL_DISABLE_HSTS "to disable HSTS support" OFF)
+mark_as_advanced(CURL_DISABLE_HSTS)
 option(CURL_DISABLE_COOKIES "to disable cookies support" OFF)
 mark_as_advanced(CURL_DISABLE_COOKIES)
 option(CURL_DISABLE_CRYPTO_AUTH "to disable cryptographic authentication" OFF)
@@ -617,6 +619,14 @@ option(USE_LIBIDN2 "Use libidn2 for IDN support" ON)
 set(HAVE_LIBIDN2 OFF)
 if(USE_LIBIDN2)
   check_library_exists_concat("idn2" idn2_lookup_ul HAVE_LIBIDN2)
+endif()
+
+if(WIN32)
+  option(USE_WIN32_IDN "Use WinIDN for IDN support" OFF)
+  if(USE_WIN32_IDN)
+    list(APPEND CURL_LIBS "Normaliz")
+    set(WANT_IDN_PROTOTYPES ON)
+  endif()
 endif()
 
 # Check for symbol dlopen (same as HAVE_LIBDL)
@@ -1100,7 +1110,6 @@ foreach(CURL_TEST
     HAVE_IN_ADDR_T
     HAVE_BOOL_T
     STDC_HEADERS
-    RETSIGTYPE_TEST
     HAVE_INET_NTOA_R_DECL
     HAVE_INET_NTOA_R_DECL_REENTRANT
     HAVE_GETADDRINFO
@@ -1199,12 +1208,6 @@ if(HAVE_FIONBIO OR
     HAVE_IOCTLSOCKET_CASE OR
     HAVE_O_NONBLOCK)
   set(HAVE_DISABLED_NONBLOCKING)
-endif()
-
-if(RETSIGTYPE_TEST)
-  set(RETSIGTYPE void)
-else()
-  set(RETSIGTYPE int)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC AND APPLE)
@@ -1363,13 +1366,14 @@ _add_if("libz"          HAVE_LIBZ)
 _add_if("brotli"        HAVE_BROTLI)
 _add_if("zstd"          HAVE_ZSTD)
 _add_if("AsynchDNS"     USE_ARES OR USE_THREADS_POSIX OR USE_THREADS_WIN32)
-_add_if("IDN"           HAVE_LIBIDN2)
+_add_if("IDN"           HAVE_LIBIDN2 OR USE_WIN32_IDN)
 _add_if("Largefile"     (SIZEOF_CURL_OFF_T GREATER 4) AND
                         ((SIZEOF_OFF_T GREATER 4) OR USE_WIN32_LARGE_FILES))
 # TODO SSP1 (Schannel) check is missing
 _add_if("SSPI"          USE_WINDOWS_SSPI)
 _add_if("GSS-API"       HAVE_GSSAPI)
 _add_if("alt-svc"       NOT CURL_DISABLE_ALTSVC)
+_add_if("HSTS"          NOT CURL_DISABLE_HSTS)
 # TODO SSP1 missing for SPNEGO
 _add_if("SPNEGO"        NOT CURL_DISABLE_CRYPTO_AUTH AND
                         (HAVE_GSSAPI OR USE_WINDOWS_SSPI))
@@ -1377,9 +1381,11 @@ _add_if("Kerberos"      NOT CURL_DISABLE_CRYPTO_AUTH AND
                         (HAVE_GSSAPI OR USE_WINDOWS_SSPI))
 # NTLM support requires crypto function adaptions from various SSL libs
 # TODO alternative SSL libs tests for SSP1, GNUTLS, NSS
-_add_if("NTLM"          (use_curl_ntlm_core OR USE_WINDOWS_SSPI))
+_add_if("NTLM"          NOT CURL_DISABLE_CRYPTO_AUTH AND
+                        (use_curl_ntlm_core OR USE_WINDOWS_SSPI))
 # TODO missing option (autoconf: --enable-ntlm-wb)
-_add_if("NTLM_WB"       (use_curl_ntlm_core OR USE_WINDOWS_SSPI) AND
+_add_if("NTLM_WB"       NOT CURL_DISABLE_CRYPTO_AUTH AND
+                        (use_curl_ntlm_core OR USE_WINDOWS_SSPI) AND
                         NOT CURL_DISABLE_HTTP AND NTLM_WB_ENABLED)
 # TODO missing option (--enable-tls-srp), depends on GNUTLS_SRP/OPENSSL_SRP
 _add_if("TLS-SRP"       USE_TLS_SRP)
