@@ -992,8 +992,8 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
                               size_t olen)
 {
     /* ZEROCOPY */
-    char *filename;
-    int disk_fd;
+    FILE *writefile;
+    int write_fd;
     ssize_t splice_pipein;
     ssize_t splice_pipeout;
     struct iovec *iovector;
@@ -1087,9 +1087,9 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
                 }
             }
 
-            filename = data->set.out;
-            disk_fd = open(filename, O_WRONLY | O_CREAT, 0666);
-            if(disk_fd < 0)
+            writefile = data->set.out;
+            write_fd = writefile->_fileno;
+            if(write_fd < 0)
             {
                 printf("failed to open output file in chop_write_zc\n");
                 wrote = -1;
@@ -1100,8 +1100,8 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
                 /* pipe -> disk */
                 splice_pipeout = splice(pipe_pd[0],
                                         NULL,
-                                        disk_fd,
-                                        &data->set.set_resume_from,
+                                        write_fd,
+                                        NULL,
                                         chunklen,
                                         0);
 
@@ -1116,7 +1116,6 @@ static CURLcode chop_write_zc(struct Curl_easy *data,
 
             free(iovector);
             check_close = 0;
-            check_close += close(disk_fd);
             check_close += close(pipe_pd[0]);
             check_close += close(pipe_pd[1]);
             if (check_close != 0)

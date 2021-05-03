@@ -45,11 +45,14 @@ int main()
     int globalInit;
     char *errbuf = malloc(CURL_ERROR_SIZE);
 
-    char *filename = "test_recv_zc.txt";
+    char *filenamezc = "test_recv_zc.txt";
     char *url = "localhost:5000";
     //char *url = "http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html";
     //char *url = "http://www.cplusplus.com/reference/cstdio/fprintf/";
     //char *url = "localhost:5000";
+
+    FILE *filezc;
+    filezc = fopen(filenamezc, "w");
 
     globalInit = curl_global_init(CURL_GLOBAL_ALL);
 
@@ -60,7 +63,7 @@ int main()
     }
 
     curl_easy_setopt(easyzc, CURLOPT_URL, url);
-    curl_easy_setopt(easyzc, CURLOPT_WRITEDATA, (void *) filename);
+    curl_easy_setopt(easyzc, CURLOPT_WRITEDATA, (void *) filezc);
     curl_easy_setopt(easyzc, CURLOPT_ERRORBUFFER, errbuf);
     //curl_easy_setopt(easyzc, CURLOPT_VERBOSE, 1);
 
@@ -78,11 +81,13 @@ int main()
     }
 
 
-    filename = "test_recv_st.txt";
+    char * filenamest = "test_recv_st.txt";
+    FILE *filest;
+    filest = fopen(filenamest, "w");
     curl_easy_reset(easyzc);
     curl_easy_setopt(easyzc, CURLOPT_URL, url);
-    curl_easy_setopt(easyzc, CURLOPT_WRITEDATA, (void *) filename);
-    curl_easy_setopt(easyzc, CURLOPT_WRITEFUNCTION, write_to_file);
+    curl_easy_setopt(easyzc, CURLOPT_WRITEDATA, (void *) filest);
+    //curl_easy_setopt(easyzc, CURLOPT_WRITEFUNCTION, write_to_file);
     curl_easy_setopt(easyzc, CURLOPT_ERRORBUFFER, errbuf);
 
     result = curl_easy_perform(easyzc);
@@ -98,6 +103,8 @@ int main()
     }
 
     free(errbuf);
+    fclose(filest);
+    fclose(filezc);
     curl_easy_cleanup(easyzc);
     curl_global_cleanup();
 
